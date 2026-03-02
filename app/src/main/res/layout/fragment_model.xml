@@ -3,7 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="#FFFFFF"
+    android:paddingTop="24dp"
+    android:paddingBottom="24dp"
+    >
+
 
     <TextView
         android:id="@+id/text_model"
@@ -15,20 +19,37 @@
         android:textColor="#181818"
         android:textFontWeight="500"
         android:textSize="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/wave_visualization"
+        app:layout_constraintBottom_toTopOf="@+id/space1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="spread" />
+        app:layout_constraintVertical_chainStyle="spread_inside" />
+
+    <Space
+        android:id="@+id/space1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/wave_visualization"
+        app:layout_constraintTop_toBottomOf="@+id/text_model"
+        app:layout_constraintVertical_weight="1" />
 
     <AppFrontend.Interface.Insights.ModelTraining.TrainingWaveView
         android:id="@+id/wave_visualization"
         android:layout_width="0dp"
-        android:layout_height="300dp"
-        app:layout_constraintBottom_toTopOf="@+id/tv_overall_perf"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/space2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_model" />
+        app:layout_constraintTop_toBottomOf="@+id/space1"
+        app:layout_constraintVertical_weight="6" />
+
+    <Space
+        android:id="@+id/space2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_overall_perf"
+        app:layout_constraintTop_toBottomOf="@+id/wave_visualization"
+        app:layout_constraintVertical_weight="1" />
 
     <TextView
         android:id="@+id/tv_overall_perf"
@@ -39,10 +60,18 @@
         android:text="Overall Performance: 93%"
         android:textColor="#181818"
         android:textSize="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/ll_stats"
+        app:layout_constraintBottom_toTopOf="@+id/space3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wave_visualization" />
+        app:layout_constraintTop_toBottomOf="@+id/space2" />
+
+    <Space
+        android:id="@+id/space3"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/ll_stats"
+        app:layout_constraintTop_toBottomOf="@+id/tv_overall_perf"
+        app:layout_constraintVertical_weight="1" />
 
     <LinearLayout
         android:id="@+id/ll_stats"
@@ -50,10 +79,10 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/tv_model_mode"
+        app:layout_constraintBottom_toTopOf="@+id/space4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_overall_perf">
+        app:layout_constraintTop_toBottomOf="@+id/space3">
 
         <TextView
             android:id="@+id/tv_est_time"
@@ -88,6 +117,14 @@
             android:textSize="16dp" />
     </LinearLayout>
 
+    <Space
+        android:id="@+id/space4"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_model_mode"
+        app:layout_constraintTop_toBottomOf="@+id/ll_stats"
+        app:layout_constraintVertical_weight="1" />
+
     <TextView
         android:id="@+id/tv_model_mode"
         android:layout_width="wrap_content"
@@ -97,11 +134,17 @@
         android:text="Training Model Mode: Image CNN"
         android:textColor="#4F4F4F"
         android:textSize="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/space_bottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_stats" />
+        app:layout_constraintTop_toBottomOf="@+id/space4" />
 
-
+    <Space
+        android:id="@+id/space_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_model_mode"
+        app:layout_constraintVertical_weight="1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

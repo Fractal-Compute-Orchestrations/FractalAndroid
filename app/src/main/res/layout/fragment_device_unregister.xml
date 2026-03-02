@@ -37,186 +37,197 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/btn_back" />
 
-    <TextView
-        android:id="@+id/tv_subtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:fontFamily="@font/genos_bold"
-        android:letterSpacing="0.1"
-        android:text="We value your experience"
-        android:textColor="#505050"
-        android:textSize="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_title" />
-
-    <TextView
-        android:id="@+id/tv_subtitle_desc"
-        android:layout_width="280dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:fontFamily="@font/genos_regular"
-        android:gravity="center"
-        android:letterSpacing="0.05"
-        android:text="Please let us know how we can improve or if you are facing any issues."
-        android:textColor="#808080"
-        android:textSize="14dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_subtitle" />
-
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/tv_subtitle_desc">
-
-        <EditText
-            android:id="@+id/et_problem_title"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/input_border"
-            android:fontFamily="@font/genos_regular"
-            android:hint="Feedback Title"
-            android:letterSpacing="0.16"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:singleLine="true"
-            android:textColor="#000000"
-            android:textColorHint="#50000000"
-            android:textSize="16dp" />
-
-        <EditText
-            android:id="@+id/et_description"
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/input_border"
-            android:fontFamily="@font/genos_regular"
-            android:gravity="top|start"
-            android:hint="Description"
-            android:inputType="textMultiLine"
-            android:letterSpacing="0.16"
-            android:padding="16dp"
-            android:textColor="#000000"
-            android:textColorHint="#50000000"
-            android:textSize="16dp" />
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@+id/btn_back"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="20" />
 
             <TextView
-                android:id="@+id/tv_attachment_status"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:id="@+id/tv_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/genos_bold"
+                android:letterSpacing="0.1"
+                android:text="We value your experience"
+                android:textColor="#505050"
+                android:textSize="16dp" />
+
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="4" />
+
+            <TextView
+                android:id="@+id/tv_subtitle_desc"
+                android:layout_width="280dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/genos_regular"
+                android:gravity="center"
+                android:letterSpacing="0.05"
+                android:text="Please let us know how we can improve or if you are facing any issues."
+                android:textColor="#808080"
+                android:textSize="14dp" />
+
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="32" />
+
+            <EditText
+                android:id="@+id/et_problem_title"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
                 android:background="@drawable/input_border"
                 android:fontFamily="@font/genos_regular"
-                android:gravity="center_vertical"
+                android:hint="Feedback Title"
                 android:letterSpacing="0.16"
                 android:paddingStart="16dp"
-                android:text="Attach Screenshots"
-                android:textColor="#50000000"
+                android:paddingEnd="16dp"
+                android:singleLine="true"
+                android:textColor="#000000"
+                android:textColorHint="#50000000"
                 android:textSize="16dp" />
 
-            <ImageButton
-                android:id="@+id/btn_attach"
-                android:layout_width="50dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="-1.5dp"
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="16" />
+
+            <EditText
+                android:id="@+id/et_description"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
                 android:background="@drawable/input_border"
-                android:padding="12dp"
-                android:src="@drawable/ic_add_plus"
-                app:tint="#000000" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layout_unregister"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginTop="24dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <CheckBox
-                android:id="@+id/cb_unregister"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/checkbox_selector"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:paddingStart="8dp"
-                android:layout_marginRight="10dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:fontFamily="@font/genos_regular"
+                android:gravity="top|start"
+                android:hint="Description"
+                android:inputType="textMultiLine"
                 android:letterSpacing="0.16"
-                android:text="I also want to unregister my device"
+                android:padding="16dp"
                 android:textColor="#000000"
-                android:textSize="16dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginTop="16dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <CheckBox
-                android:id="@+id/cb_terms"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/checkbox_selector"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:paddingStart="8dp"
-                android:layout_marginRight="10dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/genos_regular"
-                android:letterSpacing="0.16"
-                android:text="I Agree To "
-                android:textColor="#000000"
+                android:textColorHint="#50000000"
                 android:textSize="16dp" />
 
-            <TextView
-                android:id="@+id/tv_terms_link"
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="16" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_attachment_status"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/input_border"
+                    android:fontFamily="@font/genos_regular"
+                    android:gravity="center_vertical"
+                    android:letterSpacing="0.16"
+                    android:paddingStart="16dp"
+                    android:text="Attach Screenshots"
+                    android:textColor="#50000000"
+                    android:textSize="16dp" />
+
+                <ImageButton
+                    android:id="@+id/btn_attach"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="-1.5dp"
+                    android:background="@drawable/input_border"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_add_plus"
+                    app:tint="#000000" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_unregister"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="24dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <CheckBox
+                    android:id="@+id/cb_unregister"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/checkbox_selector"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:paddingStart="8dp"
+                    android:layout_marginRight="10dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/genos_regular"
+                    android:letterSpacing="0.16"
+                    android:text="I also want to unregister my device"
+                    android:textColor="#000000"
+                    android:textSize="16dp" />
+            </LinearLayout>
+
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="16" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cb_terms"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/checkbox_selector"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:paddingStart="8dp"
+                    android:layout_marginRight="10dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/genos_regular"
+                    android:letterSpacing="0.16"
+                    android:text="I Agree To "
+                    android:textColor="#000000"
+                    android:textSize="16dp" />
+
+                <TextView
+                    android:id="@+id/tv_terms_link"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/genos_regular"
+                    android:letterSpacing="0.16"
+                    android:text="Terms And Conditions"
+                    android:textColor="#000000"
+                    android:textSize="16dp" />
+            </LinearLayout>
+
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="40" />
+
+            <Button
+                android:id="@+id/btn_submit_feedback"
+                android:layout_width="200dp"
+                android:layout_height="55dp"
+                android:backgroundTint="#000000"
                 android:fontFamily="@font/genos_regular"
                 android:letterSpacing="0.16"
-                android:text="Terms And Conditions"
-                android:textColor="#000000"
-                android:textSize="16dp" />
+                android:text="Submit"
+                android:textColor="#FFFFFF"
+                android:textSize="16dp"
+                app:cornerRadius="0dp" />
+
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="40" />
+
         </LinearLayout>
-
-        <Button
-            android:id="@+id/btn_submit_feedback"
-            android:layout_width="200dp"
-            android:layout_height="55dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="40dp"
-            android:backgroundTint="#000000"
-            android:fontFamily="@font/genos_regular"
-            android:letterSpacing="0.16"
-            android:text="Submit"
-            android:textColor="#FFFFFF"
-            android:textSize="16dp"
-            app:cornerRadius="0dp" />
-
-    </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

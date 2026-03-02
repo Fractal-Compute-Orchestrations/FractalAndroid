@@ -18,79 +18,88 @@
         android:layout_height="match_parent"
         android:background="@android:color/transparent">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/fractal_logo_sidebar"
+            app:layout_constraintVertical_bias="1.41">
+
+            <LinearLayout
+            android:id="@+id/ll_group_top"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="80dp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.41">
+            app:layout_constraintBottom_toTopOf="@+id/dynamic_middle_space"
+            app:layout_constraintVertical_chainStyle="packed">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/genos_family"
+                android:letterSpacing="0.5"
+                android:text="FRACTAL"
+                android:textColor="#5A5A5A"
+                android:textFontWeight="400"
+                android:textSize="19dp" />
+
+            <TextView
+                android:id="@+id/nav_item_settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:fontFamily="@font/genos_regular"
+                android:letterSpacing="0.1"
+                android:padding="8dp"
+                android:text="Settings"
+                android:textColor="#FFFFFF"
+                android:textSize="18dp" />
+
+            <TextView
+                android:id="@+id/nav_item_about"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:fontFamily="@font/genos_regular"
+                android:letterSpacing="0.1"
+                android:padding="8dp"
+                android:text="About Us"
+                android:textColor="#FFFFFF"
+                android:textSize="18dp" />
+
+            <TextView
+                android:id="@+id/nav_item_rate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:fontFamily="@font/genos_regular"
+                android:letterSpacing="0.1"
+                android:padding="8dp"
+                android:text="Rate Us"
+                android:textColor="#FFFFFF"
+                android:textSize="18dp" />
+        </LinearLayout>
+
+            <Space
+                android:id="@+id/dynamic_middle_space"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                app:layout_constraintTop_toBottomOf="@+id/ll_group_top"
+                app:layout_constraintBottom_toTopOf="@+id/ll_group_bottom"
+                app:layout_constraintHeight_percent="0.10" />
             <LinearLayout
+                android:id="@+id/ll_group_bottom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="86dp"
                 android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:fontFamily="@font/genos_family"
-                    android:letterSpacing="0.5"
-                    android:text="FRACTAL"
-                    android:textColor="#5A5A5A"
-                    android:textFontWeight="400"
-                    android:textSize="19dp" />
-
-                <TextView
-                    android:id="@+id/nav_item_settings"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="0dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:fontFamily="@font/genos_regular"
-                    android:letterSpacing="0.1"
-                    android:padding="8dp"
-                    android:text="Settings"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18dp" />
-
-                <TextView
-                    android:id="@+id/nav_item_about"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="0dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:fontFamily="@font/genos_regular"
-                    android:letterSpacing="0.1"
-                    android:padding="8dp"
-                    android:text="About Us"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18dp" />
-
-                <TextView
-                    android:id="@+id/nav_item_rate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="0dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:fontFamily="@font/genos_regular"
-                    android:letterSpacing="0.1"
-                    android:padding="8dp"
-                    android:text="Rate Us"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@+id/dynamic_middle_space"
+                app:layout_constraintBottom_toBottomOf="parent">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -107,7 +116,6 @@
                     android:id="@+id/nav_item_reg_device"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="0dp"
                     android:background="?attr/selectableItemBackground"
                     android:fontFamily="@font/genos_regular"
                     android:letterSpacing="0.1"
@@ -116,12 +124,10 @@
                     android:textColor="#FFFFFF"
                     android:textSize="18dp" />
 
-
                 <TextView
                     android:id="@+id/nav_item_reg_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="0dp"
                     android:background="?attr/selectableItemBackground"
                     android:fontFamily="@font/genos_regular"
                     android:letterSpacing="0.1"
@@ -129,7 +135,6 @@
                     android:text="Device &amp; Reg Info"
                     android:textColor="#FFFFFF"
                     android:textSize="18dp" />
-
 
                 <TextView
                     android:id="@+id/nav_item_unreg_device"
@@ -142,9 +147,9 @@
                     android:text="Support &amp; Account"
                     android:textColor="#FFFFFF"
                     android:textSize="18dp" />
-
             </LinearLayout>
-        </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
             android:id="@+id/fractal_logo_sidebar"
@@ -168,7 +173,5 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/header_drawer_icon"
         app:tint="#FFFFFF" />
-
-
 
 </com.google.android.material.card.MaterialCardView>

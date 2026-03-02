@@ -4,11 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:clickable="true"
-
     android:padding="24dp">
 
     <ImageButton
@@ -39,60 +37,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/btn_back" />
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="80dp"
-        app:layout_constraintTop_toBottomOf="@+id/tv_title">
-
-        <EditText
-            android:id="@+id/et_username"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/input_border"
-            android:fontFamily="@font/genos_regular"
-            android:hint="Username"
-            android:letterSpacing="0.16"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:singleLine="true"
-            android:textColor="#000000"
-            android:textColorHint="#50000000"
-            android:textSize="16dp" />
-
-        <EditText
-            android:id="@+id/et_email"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/input_border"
-            android:fontFamily="@font/genos_regular"
-            android:hint="Email"
-            android:inputType="textEmailAddress"
-            android:letterSpacing="0.16"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:singleLine="true"
-            android:textColor="#000000"
-            android:textColorHint="#50000000"
-            android:textSize="16dp" />
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@+id/btn_back"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="80dp">
 
             <EditText
-                android:id="@+id/et_password"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:id="@+id/et_username"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
                 android:background="@drawable/input_border"
                 android:fontFamily="@font/genos_regular"
-                android:hint="Password"
-                android:inputType="textPassword"
+                android:hint="Username"
                 android:letterSpacing="0.16"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
@@ -101,81 +66,127 @@
                 android:textColorHint="#50000000"
                 android:textSize="16dp" />
 
-            <ImageButton
-                android:id="@+id/btn_toggle_password"
-                android:layout_width="50dp"
-                android:layout_height="match_parent"
+            <EditText
+                android:id="@+id/et_email"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
                 android:background="@drawable/input_border"
-                android:layout_marginStart="-1dp"
-                android:src="@drawable/ic_eye_hidden"
-                android:padding="12dp"
-                app:tint="#000000" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/tv_forget_password"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="8dp"
-            android:fontFamily="@font/genos_regular"
-            android:text="Forget Password"
-            android:textColor="#000000"
-            android:letterSpacing="0.16"
-            android:textSize="14dp" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginTop="40dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <CheckBox
-                android:id="@+id/cb_terms"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/checkbox_selector"
-                android:paddingStart="8dp"
-                android:layout_marginRight="10dp"
-                android:minWidth="0dp"
-                android:minHeight="0dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:fontFamily="@font/genos_regular"
+                android:hint="Email"
+                android:inputType="textEmailAddress"
                 android:letterSpacing="0.16"
-                android:text="I Agree To "
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:singleLine="true"
                 android:textColor="#000000"
+                android:textColorHint="#50000000"
                 android:textSize="16dp" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/et_password"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/input_border"
+                    android:fontFamily="@font/genos_regular"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:letterSpacing="0.16"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:singleLine="true"
+                    android:textColor="#000000"
+                    android:textColorHint="#50000000"
+                    android:textSize="16dp" />
+
+                <ImageButton
+                    android:id="@+id/btn_toggle_password"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/input_border"
+                    android:layout_marginStart="-1dp"
+                    android:src="@drawable/ic_eye_hidden"
+                    android:padding="12dp"
+                    app:tint="#000000" />
+            </LinearLayout>
+
             <TextView
-                android:id="@+id/tv_terms_link"
+                android:id="@+id/tv_forget_password"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/genos_regular"
+                android:text="Forget Password"
+                android:textColor="#000000"
+                android:letterSpacing="0.16"
+                android:textSize="14dp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="40dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cb_terms"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/checkbox_selector"
+                    android:paddingStart="8dp"
+                    android:layout_marginRight="10dp"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/genos_regular"
+                    android:letterSpacing="0.16"
+                    android:text="I Agree To "
+                    android:textColor="#000000"
+                    android:textSize="16dp" />
+
+                <TextView
+                    android:id="@+id/tv_terms_link"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/genos_regular"
+                    android:letterSpacing="0.16"
+                    android:text="Terms And Conditions"
+                    android:textColor="#000000"
+                    android:textSize="16dp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_login_register"
+                android:layout_width="200dp"
+                android:layout_height="55dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="40dp"
+                android:backgroundTint="#000000"
                 android:fontFamily="@font/genos_regular"
                 android:letterSpacing="0.16"
-                android:text="Terms And Conditions"
-                android:textColor="#000000"
-                android:textSize="16dp" />
+                android:text="Login/Register"
+                android:textColor="#FFFFFF"
+                android:textSize="16dp"
+                app:cornerRadius="0dp" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
         </LinearLayout>
-
-        <Button
-            android:id="@+id/btn_login_register"
-            android:layout_width="200dp"
-            android:layout_height="55dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="40dp"
-            android:backgroundTint="#000000"
-            android:fontFamily="@font/genos_regular"
-            android:letterSpacing="0.16"
-            android:text="Login/Register"
-            android:textColor="#FFFFFF"
-            android:textSize="16dp"
-            app:cornerRadius="0dp" />
-
-    </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,91 +6,98 @@
     android:layout_height="match_parent"
     tools:context="AppFrontend.Interface.Home.HomeFragment">
 
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:letterSpacing="0.5"
-        android:text="FRACTAL"
-        android:textStyle="bold"
-        android:textSize="20dp"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <AppFrontend.Interface.Home.DiamondTrainingView
-        android:id="@+id/diamond_toggle_button"
-        android:layout_width="143dp"
-        android:layout_height="300dp"
-        android:layout_marginTop="48dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:letterSpacing="0.24"
-        android:text="inactive"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/diamond_toggle_button" />
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="40" />
 
-    <TextView
-        android:id="@+id/computation_usage_percentage"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="76dp"
-        android:text="Computation Usage: --%"
-        android:textAlignment="center"
-        android:letterSpacing="0.16"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:letterSpacing="0.5"
+                android:text="FRACTAL"
+                android:textStyle="bold"
+                android:textSize="20dp" />
 
-    <TextView
-        android:id="@+id/processor_usage_percentage"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:letterSpacing="0.16"
-        android:text="Processor Usage: --%"
-        android:textAlignment="center"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/computation_usage_percentage" />
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="48" />
 
-    <TextView
-        android:id="@+id/ram_usage_percentage"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:letterSpacing="0.16"
-        android:text="Ram Usage: --%"
-        android:textAlignment="center"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/processor_usage_percentage" />
+            <AppFrontend.Interface.Home.DiamondTrainingView
+                android:id="@+id/diamond_toggle_button"
+                android:layout_width="143dp"
+                android:layout_height="300dp" />
 
-    <TextView
-        android:id="@+id/system_temprature_degree"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:letterSpacing="0.16"
-        android:text="System Temperature: --°C"
-        android:textAlignment="center"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ram_usage_percentage" />
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="8" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:letterSpacing="0.24"
+                android:text="inactive"
+                android:textAlignment="center"
+                android:textSize="24sp" />
+
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="76" />
+
+            <TextView
+                android:id="@+id/computation_usage_percentage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Computation Usage: --%"
+                android:textAlignment="center"
+                android:letterSpacing="0.16"
+                android:textSize="18sp" />
+
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="4" />
+
+            <TextView
+                android:id="@+id/processor_usage_percentage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:letterSpacing="0.16"
+                android:text="Processor Usage: --%"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="4" />
+
+            <TextView
+                android:id="@+id/ram_usage_percentage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:letterSpacing="0.16"
+                android:text="Ram Usage: --%"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="4" />
+
+            <TextView
+                android:id="@+id/system_temprature_degree"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:letterSpacing="0.16"
+                android:text="System Temperature: --°C"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="40" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

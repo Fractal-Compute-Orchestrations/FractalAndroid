@@ -34,11 +34,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/btn_back" />
 
+    <Space
+        android:id="@+id/space1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/btn_back"
+        app:layout_constraintBottom_toTopOf="@+id/tv_section_title"
+        app:layout_constraintVertical_weight="6" />
+
     <TextView
         android:id="@+id/tv_section_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
         android:fontFamily="@font/genos_family"
         android:textFontWeight="500"
         android:letterSpacing="0.16"
@@ -47,15 +54,24 @@
         android:textSize="18dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_title" />
+        app:layout_constraintTop_toBottomOf="@+id/space1"
+        app:layout_constraintBottom_toTopOf="@+id/space2" />
+
+    <Space
+        android:id="@+id/space2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/tv_section_title"
+        app:layout_constraintBottom_toTopOf="@+id/ll_toggles"
+        app:layout_constraintVertical_weight="4" />
 
     <LinearLayout
         android:id="@+id/ll_toggles"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/tv_section_title">
+        app:layout_constraintTop_toBottomOf="@+id/space2"
+        app:layout_constraintBottom_toTopOf="@+id/space3">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -146,11 +162,18 @@
         </LinearLayout>
     </LinearLayout>
 
+    <Space
+        android:id="@+id/space3"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/ll_toggles"
+        app:layout_constraintBottom_toTopOf="@+id/tv_charge_limit_label"
+        app:layout_constraintVertical_weight="4" />
+
     <TextView
         android:id="@+id/tv_charge_limit_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
         android:fontFamily="@font/genos_regular"
         android:letterSpacing="0.16"
         android:text="Only train when charging is\nabove: 34%"
@@ -159,16 +182,25 @@
         android:textSize="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_toggles" />
+        app:layout_constraintTop_toBottomOf="@+id/space3"
+        app:layout_constraintBottom_toTopOf="@+id/space4" />
+
+    <Space
+        android:id="@+id/space4"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/tv_charge_limit_label"
+        app:layout_constraintBottom_toTopOf="@+id/ll_slider"
+        app:layout_constraintVertical_weight="2" />
 
     <LinearLayout
         android:id="@+id/ll_slider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/tv_charge_limit_label">
+        app:layout_constraintTop_toBottomOf="@+id/space4"
+        app:layout_constraintBottom_toTopOf="@+id/space5">
 
         <TextView
             android:layout_width="wrap_content"
@@ -192,6 +224,7 @@
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
             android:minHeight="40dp" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -202,13 +235,22 @@
             android:layout_marginStart="8dp"/>
     </LinearLayout>
 
+    <Space
+        android:id="@+id/space5"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/ll_slider"
+        app:layout_constraintBottom_toTopOf="@+id/ll_charging_exclusive"
+        app:layout_constraintVertical_weight="2.5" />
+
     <LinearLayout
+        android:id="@+id/ll_charging_exclusive"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginTop="24dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/ll_slider">
+        app:layout_constraintTop_toBottomOf="@+id/space5"
+        app:layout_constraintBottom_toTopOf="@+id/space6">
 
         <TextView
             android:layout_width="0dp"
@@ -228,5 +270,13 @@
             android:src="@drawable/leaf_unchecked"
             app:tint="#000000" />
     </LinearLayout>
+
+    <Space
+        android:id="@+id/space6"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/ll_charging_exclusive"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_weight="3" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

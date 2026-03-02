@@ -11,7 +11,6 @@
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
         android:fontFamily="@font/genos_family"
         android:letterSpacing="0.16"
         android:text="Device Insights"
@@ -21,16 +20,25 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/space1"
         app:layout_constraintVertical_chainStyle="spread" />
+
+    <Space
+        android:id="@+id/space1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title"
+        app:layout_constraintBottom_toTopOf="@+id/battery_bar_container"
+        app:layout_constraintVertical_weight="40" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/battery_bar_container"
         android:layout_width="match_parent"
         android:layout_height="42dp"
         android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="40dp"
         android:background="@drawable/bg_border_black"
-        app:layout_constraintTop_toBottomOf="@+id/tv_title">
+        app:layout_constraintTop_toBottomOf="@+id/space1"
+        app:layout_constraintBottom_toTopOf="@+id/space2">
 
         <TextView
             android:layout_width="wrap_content"
@@ -108,26 +116,36 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <Space
+        android:id="@+id/space2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/battery_bar_container"
+        app:layout_constraintBottom_toTopOf="@+id/ll_status_tree"
+        app:layout_constraintVertical_weight="42" />
+
     <LinearLayout
         android:id="@+id/ll_status_tree"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="42dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="@+id/battery_bar_container"
         app:layout_constraintStart_toStartOf="@+id/battery_bar_container"
-        app:layout_constraintTop_toBottomOf="@+id/battery_bar_container">
+        app:layout_constraintTop_toBottomOf="@+id/space2"
+        app:layout_constraintBottom_toTopOf="@+id/space3">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="6dp"> <ImageView
-            android:id="@+id/ic_charging"
-            android:layout_width="13dp"
-            android:layout_height="28dp"
-            android:src="@drawable/leaf_unchecked" />
+            android:layout_marginBottom="6dp">
+
+            <ImageView
+                android:id="@+id/ic_charging"
+                android:layout_width="13dp"
+                android:layout_height="28dp"
+                android:src="@drawable/leaf_unchecked" />
 
             <TextView
                 android:id="@+id/tv_charging"
@@ -190,11 +208,13 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="33dp"> <ImageView
-                    android:id="@+id/ic_wifi"
-                    android:layout_width="13dp"
-                    android:layout_height="28dp"
-                    android:src="@drawable/ic_diamond_indicator_selected" />
+                    android:layout_marginBottom="33dp">
+
+                    <ImageView
+                        android:id="@+id/ic_wifi"
+                        android:layout_width="13dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_diamond_indicator_selected" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -234,24 +254,34 @@
         </LinearLayout>
     </LinearLayout>
 
+    <Space
+        android:id="@+id/space3"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/ll_status_tree"
+        app:layout_constraintBottom_toTopOf="@+id/ll_stats_1"
+        app:layout_constraintVertical_weight="38" />
+
     <LinearLayout
         android:id="@+id/ll_stats_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="38dp"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_status_tree"> <TextView
-        android:id="@+id/tv_device_standby"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/genos_regular"
-        android:letterSpacing="0.16"
-        android:text="Device Standby time: -- hrs"
-        android:textColor="#4F4F4F"
-        android:textSize="17dp" />
+        app:layout_constraintTop_toBottomOf="@+id/space3"
+        app:layout_constraintBottom_toTopOf="@+id/space4">
+
+        <TextView
+            android:id="@+id/tv_device_standby"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/genos_regular"
+            android:letterSpacing="0.16"
+            android:text="Device Standby time: -- hrs"
+            android:textColor="#4F4F4F"
+            android:textSize="17dp" />
 
         <TextView
             android:id="@+id/tv_network_standby"
@@ -276,16 +306,24 @@
             android:textSize="17dp" />
     </LinearLayout>
 
+    <Space
+        android:id="@+id/space4"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/ll_stats_1"
+        app:layout_constraintBottom_toTopOf="@+id/ll_stats_2"
+        app:layout_constraintVertical_weight="24" />
+
     <LinearLayout
         android:id="@+id/ll_stats_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_stats_1">
+        app:layout_constraintTop_toBottomOf="@+id/space4"
+        app:layout_constraintBottom_toTopOf="@+id/space5">
 
         <TextView
             android:id="@+id/tv_temp_storage"
@@ -309,11 +347,18 @@
             android:textSize="17dp" />
     </LinearLayout>
 
+    <Space
+        android:id="@+id/space5"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/ll_stats_2"
+        app:layout_constraintBottom_toTopOf="@+id/btn_optimize"
+        app:layout_constraintVertical_weight="40" />
+
     <TextView
         android:id="@+id/btn_optimize"
         android:layout_width="200dp"
         android:layout_height="48dp"
-        android:layout_marginTop="40dp"
         android:background="#181818"
         android:fontFamily="@font/genos_regular"
         android:gravity="center"
@@ -324,6 +369,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_stats_2" />
+        app:layout_constraintTop_toBottomOf="@+id/space5"
+        app:layout_constraintBottom_toTopOf="@+id/space6" />
+
+    <Space
+        android:id="@+id/space6"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/btn_optimize"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_weight="40" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

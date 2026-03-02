@@ -4,60 +4,78 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:paddingTop="24dp"
+    android:paddingBottom="24dp"
+    >
 
     <TextView
-        android:id="@+id/heartbeat_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="24dp"
-        android:fontFamily="@font/genos_family"
-        android:letterSpacing="0.16"
-        android:text="Heart-Beat"
-        android:textColor="#181818"
-        android:textFontWeight="500"
-        android:textSize="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/heartBeatView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    android:id="@+id/heartbeat_label"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:fontFamily="@font/genos_family"
+    android:letterSpacing="0.16"
+    android:text="Heart-Beat"
+    android:textColor="#181818"
+    android:textFontWeight="500"
+    android:textSize="16dp"
+    app:layout_constraintBottom_toTopOf="@+id/heartBeatView"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_chainStyle="spread_inside"
+    />
 
     <AppFrontend.Interface.Insights.UsageInsights.HeartBeatView
         android:id="@+id/heartBeatView"
         android:layout_width="match_parent"
-        android:layout_height="117dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.2"
-        tools:layout_editor_absoluteX="0dp" />
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/space_middle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/heartbeat_label"
+        app:layout_constraintVertical_weight="25" />
+
+    <Space
+        android:id="@+id/space_middle"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/stats_label"
+        app:layout_constraintTop_toBottomOf="@+id/heartBeatView"
+        app:layout_constraintVertical_weight="9" />
 
     <TextView
         android:id="@+id/stats_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
         android:fontFamily="@font/genos_family"
+        android:letterSpacing="0.16"
         android:text="Usage Insights"
         android:textFontWeight="500"
-        android:letterSpacing="0.16"
         android:textSize="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/space_bottom"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/heartBeatView" />
+        app:layout_constraintTop_toBottomOf="@+id/space_middle" />
+
+    <Space
+        android:id="@+id/space_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/resourceChart"
+        app:layout_constraintTop_toBottomOf="@+id/stats_label"
+        app:layout_constraintVertical_weight="5" />
 
     <AppFrontend.Interface.Insights.UsageInsights.ResourceStatsChartView
         android:id="@+id/resourceChart"
         android:layout_width="match_parent"
-        android:layout_height="280dp"
-        android:layout_margin="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/stats_label"
-        app:layout_constraintVertical_bias="0.050" />
-
+        app:layout_constraintTop_toBottomOf="@+id/space_bottom"
+        app:layout_constraintVertical_weight="61" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

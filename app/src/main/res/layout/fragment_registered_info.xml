@@ -4,8 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    android:padding="24dp"
-    >
+    android:padding="24dp">
 
     <ImageButton
         android:id="@+id/btn_back"
@@ -40,6 +39,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="24dp"
         android:scrollbars="none"
+        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_screen_title">
 
@@ -47,179 +47,196 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:paddingBottom="38dp">
+            android:orientation="vertical">
+
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="38" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="38dp"
                 android:fontFamily="@font/genos_bold"
                 android:letterSpacing="0.3"
                 android:text="User"
                 android:textColor="#4F4F4F"
                 android:textSize="17dp" />
 
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="8" />
+
             <TextView
                 android:id="@+id/tv_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:fontFamily="@font/genos_regular"
                 android:letterSpacing="0.16"
                 android:text="Username: whiteshadow69"
                 android:textColor="#4F4F4F"
                 android:textSize="17dp" />
 
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="4" />
+
             <TextView
                 android:id="@+id/tv_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
                 android:fontFamily="@font/genos_regular"
                 android:letterSpacing="0.16"
                 android:text="Email: bted4389@gmail.com"
                 android:textColor="#4F4F4F"
                 android:textSize="17dp" />
 
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="4" />
+
             <TextView
                 android:id="@+id/tv_joined_on"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
                 android:fontFamily="@font/genos_regular"
                 android:letterSpacing="0.16"
                 android:text="Joined On: 23rd Feb, 2004"
                 android:textColor="#4F4F4F"
                 android:textSize="17dp" />
 
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="38" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="38dp"
                 android:fontFamily="@font/genos_bold"
                 android:letterSpacing="0.3"
                 android:text="Platform"
                 android:textColor="#4F4F4F"
                 android:textSize="17dp" />
 
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="8" />
+
             <TextView
                 android:id="@+id/tv_platform"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:fontFamily="@font/genos_regular"
                 android:letterSpacing="0.16"
                 android:text="Android"
                 android:textColor="#4F4F4F"
                 android:textSize="17dp" />
 
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="38" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="38dp"
                 android:fontFamily="@font/genos_bold"
                 android:letterSpacing="0.3"
                 android:text="Hardware Info"
                 android:textColor="#4F4F4F"
                 android:textSize="17dp" />
 
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="8" />
+
             <TextView
                 android:id="@+id/tv_hardware_id"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:fontFamily="@font/genos_regular"
                 android:letterSpacing="0.16"
                 android:text="Hardware ID: 203-2930"
                 android:textColor="#4F4F4F"
                 android:textSize="17dp" />
 
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="4" />
+
             <TextView
                 android:id="@+id/tv_serial_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
                 android:fontFamily="@font/genos_regular"
                 android:letterSpacing="0.16"
                 android:text="Serial Number: 203-2930"
                 android:textColor="#4F4F4F"
                 android:textSize="17dp" />
 
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="4" />
+
             <TextView
                 android:id="@+id/tv_processor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
                 android:fontFamily="@font/genos_regular"
                 android:letterSpacing="0.16"
                 android:text="Processor: Snapdragon 4.2"
                 android:textColor="#4F4F4F"
                 android:textSize="17dp" />
 
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="4" />
+
             <TextView
                 android:id="@+id/tv_storage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
                 android:fontFamily="@font/genos_regular"
                 android:letterSpacing="0.16"
                 android:text="Storage: 64GB"
                 android:textColor="#4F4F4F"
                 android:textSize="17dp" />
 
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="4" />
+
             <TextView
                 android:id="@+id/tv_ram"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
                 android:fontFamily="@font/genos_regular"
                 android:letterSpacing="0.16"
                 android:text="Total RAM: 4GB"
                 android:textColor="#4F4F4F"
                 android:textSize="17dp" />
 
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="38" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="38dp"
                 android:fontFamily="@font/genos_bold"
                 android:letterSpacing="0.3"
                 android:text="Software Info"
                 android:textColor="#4F4F4F"
                 android:textSize="17dp" />
 
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="8" />
+
             <TextView
                 android:id="@+id/tv_android_version"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:fontFamily="@font/genos_regular"
                 android:letterSpacing="0.16"
                 android:text="Android Version: 7.1 Oreo"
                 android:textColor="#4F4F4F"
                 android:textSize="17dp" />
 
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="38" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="38dp"
                 android:fontFamily="@font/genos_bold"
                 android:letterSpacing="0.3"
                 android:text="Network Info"
                 android:textColor="#4F4F4F"
                 android:textSize="17dp" />
 
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="8" />
+
             <TextView
                 android:id="@+id/tv_mac_address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:fontFamily="@font/genos_regular"
                 android:letterSpacing="0.16"
                 android:text="MAC Address: 04-2D-91-98-32-0A"
                 android:textColor="#4F4F4F"
                 android:textSize="17dp" />
+
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="38" />
 
         </LinearLayout>
     </ScrollView>
