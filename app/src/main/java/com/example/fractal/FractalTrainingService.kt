@@ -15,7 +15,7 @@ import androidx.core.app.NotificationCompat
 
 class FractalTrainingService : Service() {
 
-    private val CHANNEL_ID = "FractalTrainingChannel"
+    private val CHANNEL_ID = "Fractal_TrainingChannel"
     private val NOTIFICATION_ID = 69420
 
     override fun onCreate() {
@@ -87,7 +87,10 @@ class FractalTrainingService : Service() {
                 CHANNEL_ID,
                 "Model Training Process",
                 NotificationManager.IMPORTANCE_LOW
-            )
+            ).apply {
+                // UPDATED: This prevents the app icon badge (the dot) from showing up
+                setShowBadge(false)
+            }
             val manager = getSystemService(NotificationManager::class.java)
             manager?.createNotificationChannel(channel)
         }
