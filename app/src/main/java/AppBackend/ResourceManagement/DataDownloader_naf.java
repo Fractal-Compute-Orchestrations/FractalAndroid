@@ -18,24 +18,27 @@ public class DataDownloader_naf {
         void onError(String error);
     }
 
-    public static void downloadFiles(Context context, String laptopIp, DownloadListener listener) {
+    // NEW: Added the dynamic file names to the method signature
+    public static void downloadFiles(Context context, String laptopIp,
+                                     String imagesFileName, String labelsFileName, String modelFileName,
+                                     DownloadListener listener) {
         new Thread(() -> {
             try {
                 String baseUrl = "http://" + laptopIp + ":5000/download/";
-                String imagesUrl = baseUrl + "images";
-                String labelsUrl = baseUrl + "labels";
-                String modelUrl = baseUrl + "model"; // New endpoint for TFLite model
 
-                Log.d(TAG, "Starting full sync from: " + baseUrl);
+                // FIXED: Append the dynamic file names to the server URL so it serves the right segment
+                String imagesUrl = baseUrl + "images?filename=" + imagesFileName;
+                String labelsUrl = baseUrl + "labels?filename=" + labelsFileName;
+                String modelUrl = baseUrl + "model?filename=" + modelFileName;
 
-                // 1. Download Images
-                downloadFile(context, imagesUrl, "train_images_server.bin");
-                // 2. Download Labels
-                downloadFile(context, labelsUrl, "train_labels_server.bin");
-                // 3. Download Model
-                downloadFile(context, modelUrl, "model_server.tflite");
+                Log.d(TAG, "Starting dynamic sync. Fetching: " + imagesFileName);
 
-                Log.i(TAG, "All files (Images, Labels, Model) downloaded successfully.");
+                // FIXED: Save the files locally using the exact dynamic names provided by the task
+                downloadFile(context, imagesUrl, imagesFileName);
+                downloadFile(context, labelsUrl, labelsFileName);
+                downloadFile(context, modelUrl, modelFileName);
+
+                Log.i(TAG, "All files downloaded successfully with dynamic routing.");
                 listener.onDownloadFinished();
 
             } catch (Exception e) {
@@ -71,94 +74,3 @@ public class DataDownloader_naf {
         return file;
     }
 }
-//package AppBackend.ResourceManagement;
-//
-//import android.content.Context;
-//import android.util.Log;
-//import java.io.BufferedInputStream;
-//import java.io.File;
-//import java.io.FileOutputStream;
-//import java.io.InputStream;
-//import java.net.HttpURLConnection;
-//import java.net.URL;
-//
-//public class DataDownloader_naf {
-//
-//    private static final String TAG = "FRACTAL_DOWNLOADER";
-//
-//    public interface DownloadListener {
-//        void onDownloadFinished();
-//        void onError(String error);
-//    }
-//
-//    public static void downloadFiles(Context context, String laptopIp, DownloadListener listener) {
-//        new Thread(() -> {
-//            try {
-//                String baseUrl = "http://" + laptopIp + ":5000/download/";
-//                String imagesUrl = baseUrl + "images";
-//                String labelsUrl = baseUrl + "labels";
-//                String modelUrl = baseUrl + "model";
-//
-//                Log.d(TAG, "Starting full sync from: " + baseUrl);
-//
-//                // Download to temporary files first to prevent trainer from reading partial data
-//                downloadFile(context, imagesUrl, "train_images_server.bin");
-//                downloadFile(context, labelsUrl, "train_labels_server.bin");
-//                downloadFile(context, modelUrl, "model_server.tflite");
-//
-//                Log.i(TAG, "All files successfully synchronized to External Storage.");
-//                listener.onDownloadFinished();
-//
-//            } catch (Exception e) {
-//                Log.e(TAG, "Sync failed: " + e.getMessage());
-//                listener.onError(e.getMessage());
-//            }
-//        }).start();
-//    }
-//
-//    private static File downloadFile(Context context, String urlStr, String fileName) throws Exception {
-//        URL url = new URL(urlStr);
-//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//        connection.setConnectTimeout(15000);
-//        connection.setReadTimeout(30000);
-//        connection.connect();
-//
-//        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-//            throw new Exception("Server Error (" + fileName + "): " + connection.getResponseCode());
-//        }
-//
-//        File externalDir = context.getExternalFilesDir(null);
-//        if (externalDir != null && !externalDir.exists()) {
-//            externalDir.mkdirs();
-//        }
-//
-//        // Use a temporary file during download
-//        File finalFile = new File(externalDir, fileName);
-//        File tempFile = new File(externalDir, fileName + ".tmp");
-//
-//        if (tempFile.exists()) tempFile.delete();
-//
-//        try (InputStream input = new BufferedInputStream(connection.getInputStream());
-//             FileOutputStream output = new FileOutputStream(tempFile)) {
-//
-//            byte[] data = new byte[8192];
-//            int count;
-//            while ((count = input.read(data)) != -1) {
-//                output.write(data, 0, count);
-//            }
-//            output.getFD().sync(); // Force write to physical disk
-//            output.flush();
-//        } finally {
-//            connection.disconnect();
-//        }
-//
-//        // Atomic rename: the file only "exists" with the correct name once finished
-//        if (finalFile.exists()) finalFile.delete();
-//        if (!tempFile.renameTo(finalFile)) {
-//            throw new Exception("Failed to finalize file: " + fileName);
-//        }
-//
-//        Log.d(TAG, "Downloaded and verified: " + fileName + " (" + finalFile.length() + " bytes)");
-//        return finalFile;
-//    }
-//}

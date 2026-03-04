@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:padding="24dp">
+
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="-16dp"
+        android:layout_marginTop="-8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="center"
+        android:src="@drawable/backarrow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#4F4F4F" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/genos_family"
+        android:letterSpacing="0.16"
+        android:text="Live Training Logs"
+        android:textColor="#000000"
+        android:textFontWeight="500"
+        android:textSize="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_back"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/btn_back" />
+
+    <Space
+        android:id="@+id/space1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/sv_log_container"
+        app:layout_constraintTop_toBottomOf="@+id/btn_back"
+        app:layout_constraintVertical_weight="1" />
+
+    <ScrollView
+        android:id="@+id/sv_log_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#F8F8F8"
+        android:elevation="2dp"
+        android:fadeScrollbars="false"
+        android:padding="12dp"
+        app:layout_constraintBottom_toTopOf="@+id/space2"
+        app:layout_constraintTop_toBottomOf="@+id/space1"
+        app:layout_constraintVertical_weight="10">
+
+        <TextView
+            android:id="@+id/tv_console_output"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:lineSpacingExtra="4dp"
+            android:text="========== TRAIN MODEL STARTED ==========\nWaiting for data injection...\n"
+            android:textColor="#4F4F4F"
+            android:textSize="12sp" />
+
+    </ScrollView>
+
+    <Space
+        android:id="@+id/space2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_current_status"
+        app:layout_constraintTop_toBottomOf="@+id/sv_log_container"
+        app:layout_constraintVertical_weight="1.5" />
+
+    <TextView
+        android:id="@+id/tv_current_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/genos_family"
+        android:letterSpacing="0.16"
+        android:text="Status: Training in Progress..."
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textFontWeight="500"
+        android:textSize="18dp"
+        app:layout_constraintBottom_toTopOf="@+id/space3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/space2" />
+
+    <Space
+        android:id="@+id/space3"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/ll_log_stats"
+        app:layout_constraintTop_toBottomOf="@+id/tv_current_status"
+        app:layout_constraintVertical_weight="1" />
+
+    <LinearLayout
+        android:id="@+id/ll_log_stats"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/space_bottom"
+        app:layout_constraintTop_toBottomOf="@+id/space3">
+
+        <TextView
+            android:id="@+id/tv_log_steps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/genos_regular"
+            android:letterSpacing="0.16"
+            android:text="Steps Completed: 0 / 6000"
+            android:textColor="#505050"
+            android:textSize="16dp" />
+
+        <TextView
+            android:id="@+id/tv_log_loss"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/genos_regular"
+            android:letterSpacing="0.16"
+            android:text="Current Loss: Calculating..."
+            android:textColor="#505050"
+            android:textSize="16dp" />
+    </LinearLayout>
+
+    <Space
+        android:id="@+id/space_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ll_log_stats"
+        app:layout_constraintVertical_weight="1" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

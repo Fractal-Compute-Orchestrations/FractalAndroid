@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.util.Date
 
 interface Task: Task_ModelParams, Task_DataParams{
-    var task_Id: Int
+    var task_Id: String
     var taskType: TaskType
     var task_expire_date: Date
     var task_completion_status: Boolean

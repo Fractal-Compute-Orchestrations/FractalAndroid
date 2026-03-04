@@ -100,18 +100,30 @@ class Orchestrator(private val context: Context) {
                     callback.onStatusUpdate("Downloading training resources...")
                     val latch = CountDownLatch(1)
 
-                    DataDownloader_naf.downloadFiles(context, serverIp, object : DataDownloader_naf.DownloadListener {
-                        override fun onDownloadFinished() {
-                            downloadSuccess = true
-                            latch.countDown()
-                        }
-                        override fun onError(error: String) {
-                            Log.e(TAG, "Download failed: $error")
-                            downloadSuccess = false
-                            latch.countDown()
-                        }
-                    })
-                    latch.await()
+                    if (task is Image_Task) {
+                        DataDownloader_naf.downloadFiles(
+                            context,
+                            serverIp,
+                            task.TRAIN_IMAGES_FILENAME,
+                            task.TRAIN_LABELS_FILENAME,
+                            task.MODEL_FILENAME,
+                            object : DataDownloader_naf.DownloadListener {
+                                override fun onDownloadFinished() {
+                                    downloadSuccess = true
+                                    latch.countDown()
+                                }
+                                override fun onError(error: String) {
+                                    Log.e(TAG, "Download failed: $error")
+                                    downloadSuccess = false
+                                    latch.countDown()
+                                }
+                            }
+                        )
+                        latch.await()
+                    } else {
+                        Log.e(TAG, "Task is not an Image_Task. Cannot proceed with download.")
+                        downloadSuccess = false
+                    }
                 }
 
                 if (!downloadSuccess) {
@@ -142,13 +154,13 @@ class Orchestrator(private val context: Context) {
                 // =======================================================================
                 if (callback.isCancelled() == false) {
                     Log.i(TAG, "Task ${task.task_Id} complete. Entering cooldown phase.")
-                    callback.onStatusUpdate("Process Complete\nCooling down (30s)...")
+                    callback.onStatusUpdate("Process Complete\nCooling down (15s)...")
 
                     // Reset the diamond progress visually for the next task
                     callback.onProgress(0)
 
                     // 30-Second Smart Sleep
-                    for (i in 0 until 300) {
+                    for (i in 0 until 120) {
                         if (callback.isCancelled() == true) return
                         if (callback.isPaused() == true) {
                             // If user pauses during cooldown, hold here until they resume

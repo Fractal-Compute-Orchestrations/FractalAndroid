@@ -3,7 +3,7 @@ package AppBackend.TaskContainer
 import java.util.Date
 
 class Image_Task(
-    override var task_Id: Int = -1,
+    override var task_Id: String = "-1",
     override var taskType: TaskType = TaskType.ActiveTask,
 
     override var task_expire_date: Date = Date(),

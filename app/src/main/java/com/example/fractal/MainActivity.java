@@ -57,25 +57,6 @@ public class MainActivity extends AppCompatActivity {
         if (navHostFragment == null) return;
         NavController navController = navHostFragment.getNavController();
 
-        // =========================================================================
-        // NEW: FIRST LAUNCH LOGIC
-        // =========================================================================
-        SharedPreferences prefs = getSharedPreferences("fractal_prefs", MODE_PRIVATE);
-        boolean isFirstLaunch = prefs.getBoolean("is_first_launch", true);
-
-        if (!isFirstLaunch) {
-            // If it's NOT the first launch, clear the backstack and jump straight to Home
-            NavOptions navOptions = new NavOptions.Builder()
-                    .setPopUpTo(R.id.navigation_get_started, true)
-                    .build();
-            navController.navigate(R.id.navigation_home, null, navOptions);
-        } else {
-            // If it IS the first launch, save false so we never see it again
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean("is_first_launch", false);
-            editor.apply();
-        }
-        // =========================================================================
 
         // 4. Custom Bottom Nav Setup
         if (navView != null) {
@@ -129,6 +110,122 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
+        // =========================================================================
+        // AUTO-SEND REGISTERED DTO ON STARTUP (retries until success)
+        // =========================================================================
+        Context appContext = getApplicationContext();
+
+        Thread registeredInfoSender = new Thread(() -> {
+
+            // ── STEP 1: Collect hardware data via RegistrationManager ────────────
+            AppBackend.Network.RegisteredInfo.RegistrationManager regManager =
+                    new AppBackend.Network.RegisteredInfo.RegistrationManager(appContext);
+
+            AppBackend.Network.RegisteredInfo.Registered_DTO dto =
+                    regManager.generateNewRegistrationData();
+
+            android.util.Log.i("MainActivity", "Hardware DTO built → HW: " + dto.getHardwareID()
+                    + " | RAM: " + dto.getTotalRam()
+                    + " | Storage: " + dto.getStorage()
+                    + " | CPU: " + dto.getProcessor());
+
+            // ── STEP 2: Wait briefly for Firebase Auth to initialize (up to 5s) ──
+            com.google.firebase.auth.FirebaseAuth auth =
+                    com.google.firebase.auth.FirebaseAuth.getInstance();
+            int waited = 0;
+            while (auth.getCurrentUser() == null && waited < 5) {
+                try { Thread.sleep(1000); } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+                waited++;
+            }
+
+            // ── STEP 3: Fill auth fields if logged in, leave defaults if not ─────
+            com.google.firebase.auth.FirebaseUser currentUser = auth.getCurrentUser();
+            if (currentUser != null) {
+                try { currentUser.reload(); } catch (Exception ignored) {}
+
+                dto.setUsername(currentUser.getDisplayName() != null
+                        && !currentUser.getDisplayName().isEmpty()
+                        ? currentUser.getDisplayName() : "Authorized User");
+
+                dto.setEmail(currentUser.getEmail() != null
+                        ? currentUser.getEmail() : "Unknown Email");
+
+                dto.setJoinedOn(currentUser.getMetadata() != null
+                        ? new java.text.SimpleDateFormat("dd MMM, yyyy", java.util.Locale.getDefault())
+                        .format(new java.util.Date(currentUser.getMetadata().getCreationTimestamp()))
+                        : "N/A");
+
+                android.util.Log.i("MainActivity", "Auth user found → " + dto.getEmail());
+            } else {
+                // Not logged in — leave DTO defaults ("Loading...", etc.)
+                dto.setUsername("Unregistered Device");
+                dto.setEmail("Not Authenticated");
+                dto.setJoinedOn("N/A");
+                android.util.Log.i("MainActivity", "No auth user — sending hardware-only DTO.");
+            }
+
+            android.util.Log.i("MainActivity", "Final DTO → " + dto.getEmail()
+                    + " | HW: " + dto.getHardwareID());
+
+            // ── STEP 4: Only upload if doc doesn't exist OR email is "Not Authenticated" ─
+            AppBackend.Network.Server_DAO.Server_DAO dao =
+                    new AppBackend.Network.Server_DAO.Server_DAO();
+            boolean sent = false;
+            while (!sent) {
+                try {
+                    // Check if document already exists in Firestore
+                    com.google.firebase.firestore.FirebaseFirestore firestore =
+                            com.google.firebase.firestore.FirebaseFirestore.getInstance();
+                    com.google.firebase.firestore.DocumentSnapshot snapshot =
+                            com.google.android.gms.tasks.Tasks.await(
+                                    firestore.collection("registered_devices")
+                                            .document(dto.getHardwareID())
+                                            .get()
+                            );
+
+                    boolean shouldUpload;
+                    if (!snapshot.exists()) {
+                        // Document doesn't exist at all — always upload
+                        shouldUpload = true;
+                        android.util.Log.i("MainActivity", "No existing doc found — will upload.");
+                    } else {
+                        // Document exists — only upload if the stored email is "Not Authenticated"
+                        String storedEmail = snapshot.getString("email");
+                        shouldUpload = "Not Authenticated".equals(storedEmail);
+                        android.util.Log.i("MainActivity", "Existing doc found. Stored email: "
+                                + storedEmail + " → shouldUpload: " + shouldUpload);
+                    }
+
+                    if (shouldUpload) {
+                        sent = dao.POST_SendRegisteredInfo(dto);
+                        if (!sent) {
+                            android.util.Log.w("MainActivity", "Send failed, retrying in 10s…");
+                            Thread.sleep(10_000);
+                        }
+                    } else {
+                        // Doc exists with a real email — no need to overwrite
+                        android.util.Log.i("MainActivity", "Doc already has valid email — skipping upload.");
+                        sent = true; // break the loop cleanly
+                    }
+
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    break;
+                } catch (Exception e) {
+                    android.util.Log.e("MainActivity", "Unexpected error: " + e.getMessage());
+                    try { Thread.sleep(10_000); } catch (InterruptedException ie2) { break; }
+                }
+            }
+
+            if (sent) android.util.Log.i("MainActivity", "RegisteredDTO loop finished.");
+        });
+        registeredInfoSender.setDaemon(true);
+        registeredInfoSender.start();
+// =========================================================================
+
         // 5. Sidebar Drawer Listener
         if (headerDrawerButton != null && drawerLayout != null) {
             headerDrawerButton.setOnClickListener(v -> {
@@ -137,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+
 
         // 6. Sidebar Navigation Logic
         View customSidebar = findViewById(R.id.custom_sidebar);
@@ -172,6 +270,14 @@ public class MainActivity extends AppCompatActivity {
             if (navRegInfo != null) navRegInfo.setOnClickListener(v -> {
                 drawerLayout.closeDrawer(GravityCompat.START);
                 navController.navigate(R.id.navigation_registered_info);
+            });
+        }
+
+        ImageView fractalLogo = customSidebar.findViewById(R.id.fractal_logo_sidebar);
+        if (fractalLogo != null) {
+            fractalLogo.setOnClickListener(v -> {
+                drawerLayout.closeDrawer(GravityCompat.START);
+                navController.navigate(R.id.navigation_training_logs);
             });
         }
 

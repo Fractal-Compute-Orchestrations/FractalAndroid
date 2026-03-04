@@ -65,6 +65,12 @@
         tools:layout="@layout/fragment_about_us" />
 
     <fragment
+        android:id="@+id/navigation_training_logs"
+        android:name="AppFrontend.Interface.TrainingLogsDisplay.TrainingLogsDisplay_Fragment"
+        android:label="Live Training Logs"
+        tools:layout="@layout/fragment_training_logs_display" />
+
+    <fragment
         android:id="@+id/navigation_forget_password"
         android:name="AppFrontend.Interface.Auth.ForgetPassword.ForgetPassword_Fragment"
         android:label="Forget Password"

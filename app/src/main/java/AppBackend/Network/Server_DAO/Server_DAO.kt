@@ -41,7 +41,6 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
         try {
             val serverIp = networkConfig.SERVER_IP
 
-            // Send the ID as a URL query parameter
             val url = URL("http://$serverIp:5000/api/task/current?device_id=$deviceId")
             val conn = url.openConnection() as HttpURLConnection
             conn.requestMethod = "GET"
@@ -60,9 +59,13 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                 val json = JSONObject(response)
                 val task = Image_Task()
 
-                task.task_Id = json.optInt("task_Id", -1)
+
+                task.task_Id = json.optString("task_Id", "-1")
+
+                // 2. Task Type
                 task.taskType = if (json.optString("taskType") == "ActiveTask") TaskType.ActiveTask else TaskType.PassiveTask
 
+                // 3. Expiration Date
                 val dateString = json.optString("task_expire_date", "")
                 if (dateString.isNotEmpty()) {
                     try {
@@ -75,9 +78,20 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                     task.task_expire_date = Date()
                 }
 
+                // 4. Bools and Strings
                 task.task_completion_status = json.optBoolean("task_completion_status", false)
                 task.CKPT_FILENAME = json.optString("CKPT_FILENAME", "checkpoint.ckpt")
+                task.MODEL_FILENAME = json.optString("MODEL_FILENAME", "model_server.tflite")
+                task.TRAIN_IMAGES_FILENAME = json.optString("TRAIN_IMAGES_FILENAME", "train_images_server.bin")
+                task.TRAIN_LABELS_FILENAME = json.optString("TRAIN_LABELS_FILENAME", "train_labels_server.bin")
 
+                // 5. Integers
+                task.NUM_EPOCHS = json.optInt("NUM_EPOCHS", 20)
+                task.BATCH_SIZE = json.optInt("BATCH_SIZE", 100)
+                task.NUM_TRAININGS = json.optInt("NUM_TRAININGS", 6000)
+                task.NUM_CLASSES = json.optInt("NUM_CLASSES", 10)
+
+                // 6. JSON Arrays
                 val trainingTypeJsonArray = json.optJSONArray("training_type")
                 val trainingTypeList = mutableListOf<String>()
                 if (trainingTypeJsonArray != null) {
@@ -87,9 +101,16 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                 }
                 task.training_type = trainingTypeList
 
-                task.NUM_EPOCHS = json.optInt("NUM_EPOCHS", 20)
-                task.MODEL_FILENAME = json.optString("MODEL_FILENAME", "model_server.tflite")
+                val shapeJsonArray = json.optJSONArray("INPUT_SHAPE")
+                if (shapeJsonArray != null) {
+                    val shapeList = Array(shapeJsonArray.length()) { 0 }
+                    for (i in 0 until shapeJsonArray.length()) {
+                        shapeList[i] = shapeJsonArray.getInt(i)
+                    }
+                    task.INPUT_SHAPE = shapeList
+                }
 
+                // 7. JSON Objects (Tensors)
                 val inputTensorJson = json.optJSONObject("input_tensor_name")
                 val inputMap = mutableMapOf<List<String>, Any>()
                 inputTensorJson?.keys()?.forEach { key ->
@@ -104,25 +125,30 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                 }
                 task.output_tensor_name = outputMap
 
-                task.BATCH_SIZE = json.optInt("BATCH_SIZE", 100)
-                task.NUM_TRAININGS = json.optInt("NUM_TRAININGS", 6000)
-                task.NUM_CLASSES = json.optInt("NUM_CLASSES", 10)
-                task.TRAIN_IMAGES_FILENAME = json.optString("TRAIN_IMAGES_FILENAME", "train_images_server.bin")
-                task.TRAIN_LABELS_FILENAME = json.optString("TRAIN_LABELS_FILENAME", "train_labels_server.bin")
+                // ==========================================================
+                // COMPREHENSIVE FIELD LOGGING
+                // ==========================================================
+                Log.i(TAG, "================ POPULATED TASK DETAILS ================")
+                Log.i(TAG, "task_Id:                  ${task.task_Id}")
+                Log.i(TAG, "taskType:                 ${task.taskType}")
+                Log.i(TAG, "task_expire_date:         ${task.task_expire_date}")
+                Log.i(TAG, "task_completion_status:   ${task.task_completion_status}")
+                Log.i(TAG, "CKPT_FILENAME:            ${task.CKPT_FILENAME}")
+                Log.i(TAG, "training_type:            ${task.training_type}")
+                Log.i(TAG, "NUM_EPOCHS:               ${task.NUM_EPOCHS}")
+                Log.i(TAG, "MODEL_FILENAME:           ${task.MODEL_FILENAME}")
+                Log.i(TAG, "input_tensor_name:        ${task.input_tensor_name}")
+                Log.i(TAG, "output_tensor_name:       ${task.output_tensor_name}")
+                Log.i(TAG, "BATCH_SIZE:               ${task.BATCH_SIZE}")
+                Log.i(TAG, "NUM_TRAININGS:            ${task.NUM_TRAININGS}")
+                Log.i(TAG, "NUM_CLASSES:              ${task.NUM_CLASSES}")
+                Log.i(TAG, "TRAIN_IMAGES_FILENAME:    ${task.TRAIN_IMAGES_FILENAME}")
+                Log.i(TAG, "TRAIN_LABELS_FILENAME:    ${task.TRAIN_LABELS_FILENAME}")
+                Log.i(TAG, "INPUT_SHAPE:              ${task.INPUT_SHAPE.joinToString(", ", "[", "]")}")
+                Log.i(TAG, "========================================================")
 
-                val shapeJsonArray = json.optJSONArray("INPUT_SHAPE")
-                if (shapeJsonArray != null) {
-                    val shapeList = Array(shapeJsonArray.length()) { 0 }
-                    for (i in 0 until shapeJsonArray.length()) {
-                        shapeList[i] = shapeJsonArray.getInt(i)
-                    }
-                    task.INPUT_SHAPE = shapeList
-                }
-
-                Log.i(TAG, "Task successfully fetched and parsed: Task ID ${task.task_Id}")
                 return task
             } else {
-                // If the server returns 403 (Task already completed), this triggers smoothly!
                 Log.e(TAG, "Failed to fetch task. HTTP Code: ${conn.responseCode}")
             }
         } catch (e: Exception) {
@@ -240,15 +266,12 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
             Tasks.await(loginTask)
 
             val user = auth.currentUser
-
-            // Fetch the newest verification status from the server
             user?.reload()?.let { Tasks.await(it) }
 
             if (user != null && user.isEmailVerified) {
                 Log.i(TAG, "Login Successful and Email is Verified!")
-                return true // They are verified. Let them in immediately.
+                return true
             } else {
-                // Logged in locally, but unverified. Send email and throw flag to start polling.
                 try {
                     user?.sendEmailVerification()?.let { Tasks.await(it) }
                 } catch (e: Exception) {
@@ -259,7 +282,6 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
 
         } catch (loginException: Exception) {
 
-            // If it's our custom polling flag, pass it straight to the ViewModel
             if (loginException.message?.startsWith("AWAITING_VERIFICATION:") == true) {
                 throw loginException
             }
@@ -275,14 +297,41 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                     .build()
                 user?.updateProfile(profileUpdates)?.let { Tasks.await(it) }
 
-                // SEND VERIFICATION EMAIL TO NEW USER
+                // ── Save user profile to Firestore keyed by email ─────────────────
+                try {
+                    val firestore = FirebaseFirestore.getInstance()
+                    val userData = hashMapOf(
+                        "username" to username,
+                        "email"    to email
+                    )
+                    val firestoreTask = firestore
+                        .collection("users")
+                        .document(email)
+                        .set(userData)
+                    Tasks.await(firestoreTask)
+                    Log.i(TAG, "User profile saved to Firestore for: $email")
+
+                    // ── Send full registered DTO now that Firebase fields are known ─
+                    registeredDto.username = username
+                    registeredDto.email    = email
+                    registeredDto.joinedOn = user?.metadata?.creationTimestamp?.let { timestamp ->
+                        java.text.SimpleDateFormat("dd MMM, yyyy", java.util.Locale.getDefault())
+                            .format(java.util.Date(timestamp))
+                    } ?: "N/A"
+                    POST_SendRegisteredInfo(registeredDto)
+                    // ──────────────────────────────────────────────────────────────
+
+                } catch (e: Exception) {
+                    // Non-fatal — auth still succeeded, don't block registration
+                    Log.w(TAG, "Firestore profile save failed (non-fatal): ${e.message}")
+                }
+
                 try {
                     user?.sendEmailVerification()?.let { Tasks.await(it) }
                 } catch (e: Exception) {
                     Log.w(TAG, "Failed to send initial verification email: ${e.message}")
                 }
 
-                // Throw flag to start polling for the brand new user
                 throw Exception("AWAITING_VERIFICATION:Account created! Check inbox ($email) to verify.")
 
             } catch (regException: Exception) {
@@ -405,6 +454,42 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
         } catch (e: Exception) {
             Log.e(TAG, "CRITICAL: Upload failed. Error: ${e.message}")
             return false
+        }
+    }
+
+    fun POST_SendRegisteredInfo(registeredDto: Registered_DTO): Boolean {
+        return try {
+            val firestore = FirebaseFirestore.getInstance()
+
+            val data = hashMapOf(
+                "username"       to registeredDto.username,
+                "email"          to registeredDto.email,
+                "joinedOn"       to registeredDto.joinedOn,
+                "platform"       to registeredDto.platform,
+                "hardwareId"     to registeredDto.hardwareID,
+                "serialNumber"   to registeredDto.serialNumber,
+                "processor"      to registeredDto.processor,
+                "storage"        to registeredDto.storage,
+                "totalRam"       to registeredDto.totalRam,
+                "androidVersion" to registeredDto.androidVersion,
+                "macAddress"     to registeredDto.macAddress,
+                "sentAt"         to java.text.SimpleDateFormat(
+                    "yyyy-MM-dd HH:mm:ss",
+                    java.util.Locale.getDefault()
+                ).format(java.util.Date())
+            )
+
+            val task = firestore
+                .collection("registered_devices")
+                .document(registeredDto.hardwareID)
+                .set(data)
+
+            com.google.android.gms.tasks.Tasks.await(task)
+            Log.i(TAG, "POST_SendRegisteredInfo → Firestore write successful.")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "POST_SendRegisteredInfo failed: ${e.message}")
+            false
         }
     }
 }
