@@ -41,7 +41,7 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
         try {
             val serverIp = networkConfig.SERVER_IP
 
-            val url = URL("http://$serverIp:5000/api/task/current?device_id=$deviceId")
+            val url = URL("http://$serverIp:5001/api/task/current?device_id=$deviceId")
             val conn = url.openConnection() as HttpURLConnection
             conn.requestMethod = "GET"
             conn.connectTimeout = 10000
@@ -195,7 +195,7 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
         val twoHyphens = "--"
 
         try {
-            val url = URL("http://$serverIp:5000/api/model/upload")
+            val url = URL("http://$serverIp:5001/api/model/upload")
             val conn = url.openConnection() as HttpURLConnection
             conn.requestMethod = "POST"
             conn.doInput = true

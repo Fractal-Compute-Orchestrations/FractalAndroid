@@ -19,12 +19,13 @@ public class DataDownloader_naf {
     }
 
     // NEW: Added the dynamic file names to the method signature
-    public static void downloadFiles(Context context, String laptopIp,
+
+    public static void downloadFiles(Context context, String laptopIp, String serverPort,
                                      String imagesFileName, String labelsFileName, String modelFileName,
                                      DownloadListener listener) {
         new Thread(() -> {
             try {
-                String baseUrl = "http://" + laptopIp + ":5000/download/";
+                String baseUrl = "http://" + laptopIp + ":" + serverPort + "/download/";
 
                 // FIXED: Append the dynamic file names to the server URL so it serves the right segment
                 String imagesUrl = baseUrl + "images?filename=" + imagesFileName;

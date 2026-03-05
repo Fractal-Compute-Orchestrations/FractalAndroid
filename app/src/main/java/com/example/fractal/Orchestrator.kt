@@ -21,8 +21,11 @@ class Orchestrator(private val context: Context) {
      */
     @RequiresApi(Build.VERSION_CODES.M)
     fun executeTrainingPipeline(callback: TrainingCallback? = null) {
+
         val globalState = (context.applicationContext as FractalApplication).globalState
-        val serverIp = globalState.server?.networkConfig?.SERVER_IP
+
+        val serverIp = globalState.server?.networkConfig?.SERVER_IP ?: "192.168.43.76"
+        val serverPort = globalState.server?.networkConfig?.SERVER_PORT ?: "5001"
         val deviceId = android.provider.Settings.Secure.getString(context.contentResolver, android.provider.Settings.Secure.ANDROID_ID) ?: "unknown_device"
 
         Log.i(TAG, "=========================================")
@@ -104,6 +107,7 @@ class Orchestrator(private val context: Context) {
                         DataDownloader_naf.downloadFiles(
                             context,
                             serverIp,
+                            serverPort,
                             task.TRAIN_IMAGES_FILENAME,
                             task.TRAIN_LABELS_FILENAME,
                             task.MODEL_FILENAME,
@@ -160,7 +164,7 @@ class Orchestrator(private val context: Context) {
                     callback.onProgress(0)
 
                     // 30-Second Smart Sleep
-                    for (i in 0 until 120) {
+                    for (i in 0 until 100) {
                         if (callback.isCancelled() == true) return
                         if (callback.isPaused() == true) {
                             // If user pauses during cooldown, hold here until they resume
