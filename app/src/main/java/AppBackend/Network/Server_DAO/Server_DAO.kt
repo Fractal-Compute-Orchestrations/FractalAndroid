@@ -40,8 +40,9 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
     override fun GET_Task(flushPrevious: Boolean, deviceId: String): Task? {
         try {
             val serverIp = networkConfig.SERVER_IP
+            val serverPort = networkConfig.SERVER_PORT
 
-            val url = URL("http://$serverIp:5001/api/task/current?device_id=$deviceId")
+            val url = URL("http://$serverIp:$serverPort/api/task/current?device_id=$deviceId")
             val conn = url.openConnection() as HttpURLConnection
             conn.requestMethod = "GET"
             conn.connectTimeout = 10000
@@ -195,7 +196,8 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
         val twoHyphens = "--"
 
         try {
-            val url = URL("http://$serverIp:5001/api/model/upload")
+            val serverPort = networkConfig.SERVER_PORT;
+            val url = URL("http://$serverIp:$serverPort/api/model/upload")
             val conn = url.openConnection() as HttpURLConnection
             conn.requestMethod = "POST"
             conn.doInput = true
