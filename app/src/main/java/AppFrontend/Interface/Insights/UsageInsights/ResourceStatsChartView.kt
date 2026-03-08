@@ -203,9 +203,11 @@ package AppFrontend.Interface.Insights.UsageInsights
 
 import android.content.Context
 import android.graphics.*
+import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.example.fractal.R
 import kotlin.random.Random
 
@@ -238,6 +240,7 @@ class ResourceStatsChartView @JvmOverloads constructor(
         isAntiAlias = true
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private val textPaint = Paint().apply {
         color = Color.BLACK
         textSize = 14f * dp
@@ -270,6 +273,7 @@ class ResourceStatsChartView @JvmOverloads constructor(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         frameCount++

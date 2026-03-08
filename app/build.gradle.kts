@@ -9,7 +9,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.fractal"
+        applicationId = "org.fractal.app"
         minSdk = 23
         targetSdk = 36
         versionCode = 1
@@ -24,8 +24,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false      // Turns on the code chainsaw
-            isShrinkResources = false    // Deletes unused icons and XML files
+            isMinifyEnabled = true      // Turns on the code chainsaw
+            isShrinkResources = true    // Deletes unused icons and XML files
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

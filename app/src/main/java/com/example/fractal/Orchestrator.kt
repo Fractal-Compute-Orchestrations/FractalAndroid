@@ -46,6 +46,7 @@ class Orchestrator(private val context: Context) {
                 }
 
                 // Step 1: Infinite Task Fetch Loop
+                // Step 1: Infinite Task Fetch Loop
                 var task: Task? = null
                 var attemptCount = 1
 
@@ -65,6 +66,26 @@ class Orchestrator(private val context: Context) {
                     task = globalState.server?.GET_Task(true, deviceId)
 
                     if (task != null) {
+                        if (task.task_expire_date != null && task.task_expire_date.before(java.util.Date())) {
+                            Log.w(TAG, "Task ${task.task_Id} has expired (${task.task_expire_date}). Flushing and skipping.")
+                            callback.onStatusUpdate("Task Expired. Flushing...")
+
+                            // Wipe any leftover files from this dead task
+                            AppFrontend.Flush.Flusher().flushAll(task)
+
+                            task = null // Destroy the task so the loop fetches a new one
+
+                            // Smart-sleep for 10 seconds before asking the server again
+                            for (i in 0 until 100) {
+                                if (callback.isCancelled() == true) return
+                                if (callback.isPaused() == true) break
+                                Thread.sleep(100)
+                            }
+                            attemptCount++
+                            continue
+                        }
+                        // ----------------------------------
+
                         Log.i(TAG, "Task ${task.task_Id} acquired.")
                         break
                     } else {

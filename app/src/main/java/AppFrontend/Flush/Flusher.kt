@@ -7,7 +7,7 @@ import java.io.File
 
 class Flusher {
     private val TAG = "Flusher"
-    private val filesDir = "/data/data/com.example.fractal/files/"
+    private val filesDir = "/data/data/org.fractal.app/files/"
 
     fun flushCheckpoint(task: Task) {
         val imageTask = task as Image_Task

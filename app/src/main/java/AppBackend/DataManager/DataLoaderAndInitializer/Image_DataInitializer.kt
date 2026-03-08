@@ -20,7 +20,7 @@ class Image_DataInitializer : DataInitializer {
         Log.d(TAG, "--> locadBatch(): Entering method.")
         val imageTask = task as Image_Task
 
-        val filesDir = "/data/data/com.example.fractal/files/"
+        val filesDir = "/data/data/org.fractal.app/files/"
         val imgFile = File(filesDir, imageTask.TRAIN_IMAGES_FILENAME)
         val lblFile = File(filesDir, imageTask.TRAIN_LABELS_FILENAME)
 

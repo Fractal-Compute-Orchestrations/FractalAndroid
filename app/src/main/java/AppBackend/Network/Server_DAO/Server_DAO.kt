@@ -7,15 +7,19 @@ import AppBackend.Network.networkConfig_ini
 import AppBackend.TaskContainer.Image_Task
 import AppBackend.TaskContainer.Task
 import AppBackend.TaskContainer.TaskType
+
 import AppFrontend.Interface.Auth.DeviceAuthorization.LoginRegister_DTO
 import AppFrontend.Interface.Auth.DeviceUnregister.Unregister_DTO
 import AppFrontend.Interface.Auth.ForgetPassword.ForgetPassword_DTO
+
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
+
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
+
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -35,7 +39,6 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
 
     fun POST_Ping(taskID: String, pingStatus: Boolean){ }
 
-    // --- NEW: Added deviceId parameter to pass to the server ---
     override fun GET_Task(flushPrevious: Boolean, deviceId: String): Task? {
         try {
             val url = URL("${networkConfig.getBaseUrl()}/api/task/current?device_id=$deviceId")
@@ -155,12 +158,11 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
         return null
     }
 
-    // ... (POST_UploadModelToServer and other methods remain exactly the same) ...
     override fun POST_UploadModelToServer(modeltransmissionDto: ModelTransmission_DTO): Boolean {
         val imageTask = modeltransmissionDto.task as Image_Task
         val taskId = imageTask.task_Id
         val ckptFilename = imageTask.CKPT_FILENAME
-        val uploadFile = File("/data/data/com.example.fractal/files/", ckptFilename)
+        val uploadFile = File("/data/data/org.fractal.app/files/", ckptFilename)
 
         if (!uploadFile.exists()) {
             Log.e(TAG, "Upload Failed: Checkpoint file does not exist at ${uploadFile.absolutePath}")

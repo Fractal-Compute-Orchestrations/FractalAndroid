@@ -12,9 +12,9 @@ class CheckpointManager {
 
     fun createCheckpoint(task: Task, interpreter: Interpreter, completedEpochs: Int): Boolean {
         val imageTask = task as Image_Task
-        val ckptFile = File("/data/data/com.example.fractal/files/", imageTask.CKPT_FILENAME)
+        val ckptFile = File("/data/data/org.fractal.app/files/", imageTask.CKPT_FILENAME)
         // We create a tiny metadata file next to the weights to remember the epoch number
-        val metaFile = File("/data/data/com.example.fractal/files/", "${imageTask.task_Id}_meta.json")
+        val metaFile = File("/data/data/org.fractal.app/files/", "${imageTask.task_Id}_meta.json")
 
         return try {
             // 1. Save Weights (TFLite automatically OVERWRITES the old checkpoint file)
@@ -38,8 +38,8 @@ class CheckpointManager {
 
     fun loadCheckpoint(task: Task, interpreter: Interpreter): Int {
         val imageTask = task as Image_Task
-        val ckptFile = File("/data/data/com.example.fractal/files/", imageTask.CKPT_FILENAME)
-        val metaFile = File("/data/data/com.example.fractal/files/", "${imageTask.task_Id}_meta.json")
+        val ckptFile = File("/data/data/org.fractal.app/files/", imageTask.CKPT_FILENAME)
+        val metaFile = File("/data/data/org.fractal.app/files/", "${imageTask.task_Id}_meta.json")
 
         // If either file is missing, we must start from scratch at Epoch 0
         if (!ckptFile.exists() || !metaFile.exists()) {
