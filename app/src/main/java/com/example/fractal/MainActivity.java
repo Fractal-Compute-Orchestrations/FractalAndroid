@@ -9,6 +9,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+import java.util.HashMap;
+import java.util.Map;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
@@ -42,6 +46,31 @@ public class MainActivity extends AppCompatActivity {
         // 1. Inflate Layout
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // =========================================================================
+        // FIREBASE REMOTE CONFIG INITIALIZATION (DYNAMIC SERVER URLS)
+        // =========================================================================
+        FirebaseRemoteConfig mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                .setMinimumFetchIntervalInSeconds(3600) // Fetches from cloud once an hour
+                .build();
+        mFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
+
+        // 1. Set local fallback defaults (used if there is no internet on first launch)
+        Map<String, Object> defaults = new HashMap<>();
+        defaults.put("server_protocol", "https");
+        defaults.put("server_ip", "fractal-grid.duckdns.org");
+        defaults.put("server_port", ""); // Empty because HTTPS automatically uses Port 443
+        mFirebaseRemoteConfig.setDefaultsAsync(defaults);
+
+        // 2. Fetch the latest live URLs from the Firebase Cloud
+        mFirebaseRemoteConfig.fetchAndActivate()
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        android.util.Log.i("RemoteConfig", "Cloud Server URLs updated successfully!");
+                    }
+                });
+        // =========================================================================
 
         // 2. Safe View Lookups
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
@@ -222,9 +251,10 @@ public class MainActivity extends AppCompatActivity {
 
             if (sent) android.util.Log.i("MainActivity", "RegisteredDTO loop finished.");
         });
+
         registeredInfoSender.setDaemon(true);
         registeredInfoSender.start();
-// =========================================================================
+        // =========================================================================
 
         // 5. Sidebar Drawer Listener
         if (headerDrawerButton != null && drawerLayout != null) {
@@ -234,7 +264,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
-
 
         // 6. Sidebar Navigation Logic
         View customSidebar = findViewById(R.id.custom_sidebar);

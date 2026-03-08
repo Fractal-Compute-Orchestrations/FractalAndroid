@@ -24,8 +24,8 @@ class Orchestrator(private val context: Context) {
 
         val globalState = (context.applicationContext as FractalApplication).globalState
 
-        val serverIp = globalState.server?.networkConfig?.SERVER_IP ?: "192.168.43.76"
-        val serverPort = globalState.server?.networkConfig?.SERVER_PORT ?: "5001"
+//        val serverIp = globalState.server?.networkConfig?.SERVER_IP ?: "192.168.43.76"
+//        val serverPort = globalState.server?.networkConfig?.SERVER_PORT ?: "5001"
         val deviceId = android.provider.Settings.Secure.getString(context.contentResolver, android.provider.Settings.Secure.ANDROID_ID) ?: "unknown_device"
 
         Log.i(TAG, "=========================================")
@@ -93,21 +93,21 @@ class Orchestrator(private val context: Context) {
                     if (modelFile.exists() && modelFile.length() > 0 &&
                         imagesFile.exists() && imagesFile.length() > 0 &&
                         labelsFile.exists() && labelsFile.length() > 0) {
-                        callback.onStatusUpdate("Local files found. Skipping download...")
+                        callback?.onStatusUpdate("Local files found. Skipping download...")
                         needsDownload = false
                         downloadSuccess = true
                     }
                 }
 
                 if (needsDownload) {
-                    callback.onStatusUpdate("Downloading training resources...")
+                    callback?.onStatusUpdate("Downloading training resources...")
+
+                    // THIS is the line that was missing!
                     val latch = CountDownLatch(1)
 
                     if (task is Image_Task) {
                         DataDownloader_naf.downloadFiles(
                             context,
-                            serverIp,
-                            serverPort,
                             task.TRAIN_IMAGES_FILENAME,
                             task.TRAIN_LABELS_FILENAME,
                             task.MODEL_FILENAME,
@@ -121,9 +121,13 @@ class Orchestrator(private val context: Context) {
                                     downloadSuccess = false
                                     latch.countDown()
                                 }
+                                override fun onProgressUpdate(percentage: Int) {
+                                    // Pushes the live percentage straight to your UI!
+                                    callback?.onStatusUpdate("Downloading resources... $percentage%")
+                                }
                             }
                         )
-                        latch.await()
+                        latch.await() // Pauses Orchestrator until download is 100% done
                     } else {
                         Log.e(TAG, "Task is not an Image_Task. Cannot proceed with download.")
                         downloadSuccess = false
@@ -131,7 +135,7 @@ class Orchestrator(private val context: Context) {
                 }
 
                 if (!downloadSuccess) {
-                    callback.onStatusUpdate("Error: Download failed")
+                    callback?.onStatusUpdate("Error: Download failed")
                     // Instead of killing the master loop, we break this iteration and wait 10s before trying again
                     Thread.sleep(10000)
                     continue
