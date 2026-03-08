@@ -27,7 +27,6 @@ import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-
 import android.util.Base64
 
 class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : Auth, ModelTransmission, TaskPopulate {
@@ -39,12 +38,6 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
     // --- NEW: Added deviceId parameter to pass to the server ---
     override fun GET_Task(flushPrevious: Boolean, deviceId: String): Task? {
         try {
-            val serverIp = networkConfig.SERVER_IP
-            val serverPort = networkConfig.SERVER_PORT
-
-//            val url = URL("http://$serverIp:$serverPort/api/task/current?device_id=$deviceId")
-//            val conn = url.openConnection() as HttpURLConnection
-
             val url = URL("${networkConfig.getBaseUrl()}/api/task/current?device_id=$deviceId")
             val conn = url.openConnection() as HttpURLConnection
 
@@ -164,7 +157,6 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
 
     // ... (POST_UploadModelToServer and other methods remain exactly the same) ...
     override fun POST_UploadModelToServer(modeltransmissionDto: ModelTransmission_DTO): Boolean {
-        val serverIp = networkConfig.SERVER_IP
         val imageTask = modeltransmissionDto.task as Image_Task
         val taskId = imageTask.task_Id
         val ckptFilename = imageTask.CKPT_FILENAME
@@ -200,10 +192,6 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
         val twoHyphens = "--"
 
         try {
-            val serverPort = networkConfig.SERVER_PORT;
-//            val url = URL("http://$serverIp:$serverPort/api/model/upload")
-//            val conn = url.openConnection() as HttpURLConnection
-
             val url = URL("${networkConfig.getBaseUrl()}/api/model/upload")
             val conn = url.openConnection() as HttpURLConnection
 
