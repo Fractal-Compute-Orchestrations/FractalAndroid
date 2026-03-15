@@ -1,109 +1,3 @@
-//package AppFrontend.Interface.Home;
-//
-//import android.app.Application;
-//import android.content.Intent;
-//import android.util.Log;
-//import androidx.annotation.NonNull;
-//import androidx.core.content.ContextCompat;
-//import androidx.lifecycle.AndroidViewModel;
-//import androidx.lifecycle.MutableLiveData;
-//
-//import AppFrontend.Interface.Home.trainer_naf;
-//import AppBackend.ResourceManagement.ResourceManager.ResourceManager_Live_DTO;
-//import AppBackend.ResourceManagement.FileUploader_naf;
-//import com.example.fractal.FractalTrainingService; // Import the new service
-//
-//import java.io.File;
-//import java.util.concurrent.Executors;
-//import java.util.concurrent.TimeUnit;
-//
-//public class HomeViewModel extends AndroidViewModel {
-//    private final MutableLiveData<Integer> trainingProgress = new MutableLiveData<>(0);
-//    private final MutableLiveData<ResourceManager_Live_DTO> liveStats = new MutableLiveData<>();
-//    private final MutableLiveData<String> statusMessage = new MutableLiveData<>("inactive");
-//
-//    private final trainer_naf trainerEngine;
-//    private final ResourceManager_Live_DTO resourceManager;
-//    private static final String TAG = "FRACTAL_VM";
-//
-//    public HomeViewModel(@NonNull Application application) {
-//        super(application);
-//        trainerEngine = new trainer_naf(application);
-//        resourceManager = new ResourceManager_Live_DTO(application);
-//
-//        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
-//            resourceManager.updateStatistics(application);
-//            liveStats.postValue(resourceManager);
-//        }, 0, 500, TimeUnit.MILLISECONDS);
-//    }
-//
-//    public void runAILifecycle(String laptopIp) {
-//        new Thread(() -> {
-//            try {
-//                // --- 1. START IMMORTAL FOREGROUND SERVICE ---
-//                Intent startIntent = new Intent(getApplication(), FractalTrainingService.class);
-//                startIntent.putExtra("PROGRESS", 0);
-//                ContextCompat.startForegroundService(getApplication(), startIntent);
-//
-//                statusMessage.postValue("Checking checkpoints...");
-//                trainerEngine.restoreWeights();
-//
-//                trainerEngine.trainModel(new trainer_naf.TrainingCallback() {
-//                    @Override
-//                    public void onProgress(int percentage) {
-//                        trainingProgress.postValue(percentage);
-//                        statusMessage.postValue("Training: " + percentage + "%");
-//
-//                        // --- 2. UPDATE NOTIFICATION PROGRESS ---
-//                        Intent updateIntent = new Intent(getApplication(), FractalTrainingService.class);
-//                        updateIntent.putExtra("PROGRESS", percentage);
-//                        getApplication().startService(updateIntent);
-//                    }
-//
-//                    @Override
-//                    public void onLog(String message) {
-//                        Log.d(TAG, "Engine: " + message);
-//                    }
-//                });
-//
-//                statusMessage.postValue("Training Completed");
-//                Thread.sleep(500);
-//
-//                statusMessage.postValue("Saving weights...");
-//                boolean saveSuccessful = trainerEngine.saveWeights();
-//
-//                if (saveSuccessful) {
-//                    statusMessage.postValue("Uploading to server...");
-//                    File ckptFile = new File(getApplication().getFilesDir(), "checkpoint.ckpt");
-//
-//                    if (ckptFile.exists() && ckptFile.length() > 0) {
-//                        FileUploader_naf.uploadCheckpoint(getApplication(), laptopIp, ckptFile);
-//                    }
-//                }
-//
-//                float[] dummyInput = new float[784];
-//                int result = trainerEngine.inferModel(dummyInput);
-//
-//                Thread.sleep(1000);
-//                statusMessage.postValue("Inference Result: " + result);
-//                statusMessage.postValue("Process Complete");
-//
-//            } catch (Exception e) {
-//                Log.e(TAG, "Lifecycle Error: " + e.getMessage());
-//                statusMessage.postValue("Error: " + e.getMessage());
-//            } finally {
-//                // --- 3. STOP SERVICE WHEN DONE OR ON CRASH ---
-//                Intent stopIntent = new Intent(getApplication(), FractalTrainingService.class);
-//                stopIntent.setAction("STOP_SERVICE");
-//                getApplication().startService(stopIntent);
-//            }
-//        }).start();
-//    }
-//
-//    public MutableLiveData<Integer> getTrainingProgress() { return trainingProgress; }
-//    public MutableLiveData<ResourceManager_Live_DTO> getLiveStats() { return liveStats; }
-//    public MutableLiveData<String> getStatusMessage() { return statusMessage; }
-//}
 package AppFrontend.Interface.Home;
 
 import android.app.Application;
@@ -127,12 +21,16 @@ import java.util.concurrent.TimeUnit;
 
 public class HomeViewModel extends AndroidViewModel {
 
-    // 1. Grab the Singleton Repository
     private final TrainingStateRepository repository = TrainingStateRepository.getInstance();
 
     private final MutableLiveData<ResourceManager_Live_DTO> liveStats = new MutableLiveData<>();
     private final ResourceManager_Live_DTO resourceManager;
     private static final String TAG = "FRACTAL_VM";
+
+    // Tracks whether the pipeline is currently in the gulping phase.
+    // Stays true across paused/resuming sub-states so pause/resume
+    // behaviour routes correctly from the diamond button.
+    private volatile boolean isCurrentlyDownloading = false;
 
     public HomeViewModel(@NonNull Application application) {
         super(application);
@@ -146,10 +44,11 @@ public class HomeViewModel extends AndroidViewModel {
 
     public void toggleAILifecycle() {
         if (!repository.isActive) {
-            // 1. Turn ON (Enters Waiting state initially)
+            // 1. Turn ON
             repository.isActive = true;
             repository.isWaiting = true;
             repository.isPaused = false;
+            isCurrentlyDownloading = false;
             repository.statusMessage.postValue("Initializing...");
             startPipelineThread();
 
@@ -157,18 +56,57 @@ public class HomeViewModel extends AndroidViewModel {
             // 2. Cancel while WAITING
             repository.isActive = false;
             repository.isWaiting = false;
+            isCurrentlyDownloading = false;
+            // DO NOT CHANGE: Tied to wave animation logic in Fragment
             repository.statusMessage.postValue("Process Cancelled");
+            stopForegroundService();
 
         } else if (!repository.isPaused) {
-            // 3. Pause while TRAINING
+            // 3. Pause — behaviour differs by phase
             repository.isPaused = true;
-            repository.statusMessage.postValue("Training Paused");
+
+            if (isCurrentlyDownloading) {
+                // ── GULPING PHASE: keep the notification, swap to play icon ──
+                repository.statusMessage.postValue("Gulping Paused");
+                Intent pausedIntent = new Intent(getApplication(), FractalTrainingService.class);
+                pausedIntent.putExtra("STATUS_TEXT", "Gulping Paused");
+                pausedIntent.putExtra("PROGRESS",
+                        repository.trainingProgress.getValue() != null
+                                ? repository.trainingProgress.getValue() : 0);
+                getApplication().startService(pausedIntent);
+            } else {
+                // ── SYNTHESIS PHASE: dismiss the notification entirely ──────────
+                repository.statusMessage.postValue("Synthesis Paused");
+                stopForegroundService();
+            }
 
         } else {
             // 4. Resume while PAUSED
             repository.isPaused = false;
-            repository.statusMessage.postValue("Training Resumed...");
+
+            if (isCurrentlyDownloading) {
+                // The pause trap in DataDownloader_naf unblocks automatically
+                // because isPaused is now false. The next onProgressUpdate call
+                // will fire onStatusUpdate("Gulping data chunk... X%") which
+                // restores the notification normally. No extra intent needed.
+                repository.statusMessage.postValue("Resuming gulping...");
+            } else {
+                // Synthesis resume — restart the notification
+                repository.statusMessage.postValue("Synthesis Resumed...");
+                Intent startIntent = new Intent(getApplication(), FractalTrainingService.class);
+                startIntent.putExtra("PROGRESS",
+                        repository.trainingProgress.getValue() != null
+                                ? repository.trainingProgress.getValue() : 0);
+                startIntent.putExtra("STATUS_TEXT", "Synthesizing Data");
+                ContextCompat.startForegroundService(getApplication(), startIntent);
+            }
         }
+    }
+
+    private void stopForegroundService() {
+        Intent stopIntent = new Intent(getApplication(), FractalTrainingService.class);
+        stopIntent.setAction("STOP_SERVICE");
+        getApplication().startService(stopIntent);
     }
 
     private void startPipelineThread() {
@@ -182,11 +120,16 @@ public class HomeViewModel extends AndroidViewModel {
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     orchestrator.executeTrainingPipeline(new TrainingCallback() {
+
                         @Override
                         public void onProgress(int percentage) {
+                            // onProgress is only fired during synthesis
+                            isCurrentlyDownloading = false;
                             repository.trainingProgress.postValue(percentage);
+
                             Intent updateIntent = new Intent(getApplication(), FractalTrainingService.class);
                             updateIntent.putExtra("PROGRESS", percentage);
+                            updateIntent.putExtra("STATUS_TEXT", "Synthesizing Data");
                             getApplication().startService(updateIntent);
                         }
 
@@ -202,6 +145,46 @@ public class HomeViewModel extends AndroidViewModel {
                         @Override
                         public void onStatusUpdate(@NonNull String message) {
                             repository.statusMessage.postValue(message);
+
+                            // ── All Gulping-phase messages ───────────────────────────
+                            // We explicitly check for the phrases sent by Orchestrator
+                            if (message.startsWith("Gulping data chunk") || message.equals("Gulping Internet Chunk...")) {
+                                isCurrentlyDownloading = true;
+                                try {
+                                    String numericOnly = message.replaceAll("[^0-9]", "");
+                                    if (!numericOnly.isEmpty()) {
+                                        int percent = Integer.parseInt(numericOnly);
+                                        Intent downloadIntent = new Intent(getApplication(), FractalTrainingService.class);
+                                        downloadIntent.putExtra("PROGRESS", percent);
+                                        downloadIntent.putExtra("STATUS_TEXT", "Gulping");
+                                        getApplication().startService(downloadIntent);
+                                    }
+                                } catch (Exception e) {
+                                    Log.w(TAG, "Could not parse gulping percentage from: " + message);
+                                }
+
+                            } else if (message.startsWith("Gulping Paused")) {
+                                // Covers both "Gulping Paused" and "Gulping Paused: X%"
+                                try {
+                                    String numericOnly = message.replaceAll("[^0-9]", "");
+                                    if (!numericOnly.isEmpty()) {
+                                        int percent = Integer.parseInt(numericOnly);
+                                        Intent pausedIntent = new Intent(getApplication(), FractalTrainingService.class);
+                                        pausedIntent.putExtra("PROGRESS", percent);
+                                        pausedIntent.putExtra("STATUS_TEXT", "Gulping Paused");
+                                        getApplication().startService(pausedIntent);
+                                    }
+                                } catch (Exception e) {
+                                    Log.w(TAG, "Could not parse paused percentage from: " + message);
+                                }
+
+                            } else if (message.equals("Resuming gulping...")) {
+                                // Still in gulp phase — do not clear isCurrentlyDownloading.
+
+                            } else {
+                                // Any other message means we have left the gulping phase
+                                isCurrentlyDownloading = false;
+                            }
                         }
 
                         @Override
@@ -210,15 +193,12 @@ public class HomeViewModel extends AndroidViewModel {
                             if (currentStats != null) {
                                 currentStats.setEpochsCompleted(completedEpochs + " / " + totalEpochs);
                                 currentStats.setEstimatedTimeLeft(timeLeft);
-
                                 int perf = Math.max(0, 100 - (int)(loss * 100));
                                 currentStats.setOverallPerformance(perf + "%");
-
                                 repository.detailedStats.postValue(currentStats);
                             }
                         }
 
-                        // --- NEW CALLBACK IMPLEMENTATIONS ---
                         @Override
                         public boolean isPaused() {
                             return repository.isPaused;
@@ -234,7 +214,6 @@ public class HomeViewModel extends AndroidViewModel {
                             repository.isWaiting = isWaiting;
                         }
 
-                        // --- SMART HARDWARE TRAP IMPLEMENTATION ---
                         @Override
                         public String checkLiveConditions() {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -250,11 +229,10 @@ public class HomeViewModel extends AndroidViewModel {
                 Log.e(TAG, "Lifecycle Error: " + e.getMessage());
                 repository.statusMessage.postValue("Error: " + e.getMessage());
             } finally {
-                // Ensure everything resets if the thread naturally finishes or is cancelled
                 repository.isActive = false;
                 repository.isWaiting = false;
                 repository.isPaused = false;
-                repository.trainingProgress.postValue(0);
+                isCurrentlyDownloading = false;
 
                 Intent stopIntent = new Intent(getApplication(), FractalTrainingService.class);
                 stopIntent.setAction("STOP_SERVICE");
@@ -263,9 +241,8 @@ public class HomeViewModel extends AndroidViewModel {
         }).start();
     }
 
-    // 4. Return the Repository's LiveData to the UI
     public MutableLiveData<Integer> getTrainingProgress() { return repository.trainingProgress; }
-    public MutableLiveData<String> getStatusMessage() { return repository.statusMessage; }
+    public MutableLiveData<String> getStatusMessage()     { return repository.statusMessage; }
     public MutableLiveData<ResourceStatistics> getDetailedStats() { return repository.detailedStats; }
     public MutableLiveData<ResourceManager_Live_DTO> getLiveStats() { return liveStats; }
 }

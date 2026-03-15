@@ -76,7 +76,8 @@ class ImageTrainer : Trainer {
 
     override fun trainModel(callback: TrainingCallback?) {
         Log.d(TAG, "========== TRAIN MODEL STARTED ==========")
-        TrainingLogger.currentStatus.postValue("Status: Training in Progress...")
+//        TrainingLogger.currentStatus.postValue("Status: Training in Progress...")
+        TrainingLogger.currentStatus.postValue("Status: Synthesizing Mobile Data...")
 
         val imageTask = task as Image_Task
 
@@ -109,8 +110,10 @@ class ImageTrainer : Trainer {
         if (currentEpoch >= numEpochs) {
             Log.i(TAG, "Model is already fully trained for $numEpochs epochs. Skipping training phase.")
             callback?.onProgress(100)
-            callback?.onStatusUpdate("Training Already Completed")
-            TrainingLogger.currentStatus.postValue("Status: Training Already Completed")
+//            callback?.onStatusUpdate("Training Already Completed")
+//            TrainingLogger.currentStatus.postValue("Status: Training Already Completed")
+            callback?.onStatusUpdate("Conversion Already Completed")
+            TrainingLogger.currentStatus.postValue("Status: Conversion Already Completed")
             return
         }
 
@@ -155,8 +158,10 @@ class ImageTrainer : Trainer {
                             callback?.onStatusUpdate(hardwareIssue) // e.g. "Standby: Awaiting Wi-Fi"
                             TrainingLogger.currentStatus.postValue("Status: $hardwareIssue")
                         } else {
-                            callback?.onStatusUpdate("Training Paused")
-                            TrainingLogger.currentStatus.postValue("Status: Training Paused")
+//                            callback?.onStatusUpdate("Training Paused")
+//                            TrainingLogger.currentStatus.postValue("Status: Training Paused")
+                            callback?.onStatusUpdate("Synthesis Paused")
+                            TrainingLogger.currentStatus.postValue("Status: Synthesis Paused")
                         }
 
                         Thread.sleep(3000) // Sleep 3 seconds before re-evaluating
@@ -207,7 +212,9 @@ class ImageTrainer : Trainer {
                         val percent = ((currentStep.toFloat() / totalSteps.toFloat()) * 100).toInt()
 
                         callback?.onProgress(percent)
-                        callback?.onStatusUpdate("Training: $percent%")
+//                        callback?.onStatusUpdate("Training: $percent%")
+//                        callback?.onStatusUpdate("Training: $percent%")
+                        callback?.onStatusUpdate("Generating Internet: $percent%")
 
                         // Build the log string exactly like your original Log.d
                         val logMessage = "Step $currentStep/$totalSteps | Epoch: $epoch | Loss: $lastLoss"
@@ -253,8 +260,13 @@ class ImageTrainer : Trainer {
 
         // Guarantee the UI hits 100% when finished
         callback?.onProgress(100)
-        callback?.onStatusUpdate("Training: 100%")
-        TrainingLogger.currentStatus.postValue("Status: Training Completed Successfully")
+//        callback?.onStatusUpdate("Training: 100%")
+//        TrainingLogger.currentStatus.postValue("Status: Training Completed Successfully")
+//        Log.i(TAG, "Training cycle completely finished! All $numEpochs epochs done.")
+
+        callback?.onStatusUpdate("Generation Complete: 100%")
+        TrainingLogger.currentStatus.postValue("Status: Synthesis Completed Successfully")
         Log.i(TAG, "Training cycle completely finished! All $numEpochs epochs done.")
+
     }
 }

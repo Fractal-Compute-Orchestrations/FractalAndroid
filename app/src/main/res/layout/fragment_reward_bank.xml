@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header_wrapper_black"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="20dp"
+        android:paddingStart="30dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="20dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/btn_menu_black"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="-16dp"
+            android:scaleType="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/header_drawer_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="#181818" />
+
+        <ImageView
+            android:id="@+id/logo_black"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/fractal_logo"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="#181818" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/tv_title_black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/genos_regular"
+        android:letterSpacing="0.16"
+        android:text="Internet Bank"
+        android:textColor="#181818"
+        android:textSize="18dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/header_wrapper_black" />
+
+    <TextView
+        android:id="@+id/tv_value_black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/genos_family"
+        android:letterSpacing="0.01"
+        android:text="0.0"
+        android:textColor="#181818"
+        android:includeFontPadding="false"
+        android:textFontWeight="700"
+        android:textSize="155dp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_unit_black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title_black"
+        app:layout_constraintVertical_chainStyle="packed"
+
+        app:layout_constraintVertical_bias="0.65" /> <TextView
+    android:id="@+id/tv_unit_black"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:translationY="-40dp"
+    android:fontFamily="@font/genos_bold"
+    android:letterSpacing="0.10"
+    android:includeFontPadding="false"
+    android:text="G B s"
+    android:textColor="#181818"
+    android:textFontWeight="700"
+    android:textSize="67dp"
+    app:layout_constraintBottom_toTopOf="@+id/tv_subtitle_black"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/tv_value_black" />
+
+    <TextView
+        android:id="@+id/tv_subtitle_black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:translationY="-50dp"
+        android:fontFamily="@font/genos_regular"
+        android:letterSpacing="0.24"
+        android:text="Data Downloaded"
+        android:textColor="#181818"
+        android:textFontWeight="500"
+        android:textSize="18dp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_validity_black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_unit_black" />
+
+    <TextView
+        android:id="@+id/tv_validity_black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="120dp"
+        android:background="#181818"
+        android:fontFamily="@font/genos_regular"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:text="Valid till: --/--/----"
+        android:textColor="#FFFFFF"
+        android:textSize="18dp"
+        android:letterSpacing="0.16"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <AppFrontend.Interface.RewardBank.FluidWaveLayout
+        android:id="@+id/liquid_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/white_text_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/header_wrapper_white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="20dp"
+                android:paddingStart="30dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="20dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <ImageButton
+                    android:id="@+id/btn_menu_white"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_marginStart="-16dp"
+                    android:scaleType="center"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/header_drawer_icon"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="#FFFFFF" />
+
+                <ImageView
+                    android:id="@+id/logo_white"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/fractal_logo"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="#FFFFFF" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/tv_title_white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/genos_regular"
+                android:letterSpacing="0.16"
+                android:text="Internet Bank"
+                android:textColor="#FFFFFF"
+                android:textSize="18dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/header_wrapper_white" />
+
+            <TextView
+                android:id="@+id/tv_value_white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/genos_family"
+                android:letterSpacing="0.01"
+                android:text="0.0"
+                android:textColor="#FFFFFF"
+                android:includeFontPadding="false"
+                android:textFontWeight="700"
+                android:textSize="155dp"
+                app:layout_constraintBottom_toTopOf="@+id/tv_unit_white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_white"
+                app:layout_constraintVertical_chainStyle="packed"
+
+                app:layout_constraintVertical_bias="0.65" /> <TextView
+            android:id="@+id/tv_unit_white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:translationY="-40dp"
+            android:fontFamily="@font/genos_bold"
+            android:letterSpacing="0.10"
+            android:includeFontPadding="false"
+            android:text="G B s"
+            android:textColor="#FFFFFF"
+            android:textFontWeight="700"
+            android:textSize="67dp"
+            app:layout_constraintBottom_toTopOf="@+id/tv_subtitle_white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_value_white" />
+
+            <TextView
+                android:id="@+id/tv_subtitle_white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:translationY="-50dp"
+                android:fontFamily="@font/genos_regular"
+                android:letterSpacing="0.24"
+                android:text="Data Downloaded"
+                android:textColor="#FFFFFF"
+                android:textFontWeight="500"
+                android:textSize="18dp"
+                app:layout_constraintBottom_toTopOf="@+id/tv_validity_white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_unit_white" />
+
+            <TextView
+                android:id="@+id/tv_validity_white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="120dp"
+                android:background="#FFFFFF"
+                android:fontFamily="@font/genos_regular"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:text="Valid till: --/--/----"
+                android:textColor="#181818"
+                android:textSize="18dp"
+                android:letterSpacing="0.16"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </AppFrontend.Interface.RewardBank.FluidWaveLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

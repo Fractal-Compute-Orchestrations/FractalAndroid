@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Fractal</string>
-    <string name="title_device">Device</string>
+    <string name="title_device">Orchestration</string>
     <string name="title_home">Home</string>
-    <string name="title_model">Model</string>
+    <string name="title_model">Internet Bank</string>
     <string name="title_get_started">Get Started</string>
 </resources>

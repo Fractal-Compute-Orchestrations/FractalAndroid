@@ -7,6 +7,19 @@
     android:background="#FFFFFF"
     android:padding="32dp">
 
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="-8dp"
+        android:layout_marginStart="-16dp"
+        android:scaleType="center"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/backarrow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#181818" />
+
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
@@ -17,24 +30,23 @@
         android:textColor="#181818"
         android:textFontWeight="400"
         android:textSize="18dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_back"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/space1"
-        app:layout_constraintVertical_chainStyle="spread" />
+        app:layout_constraintTop_toTopOf="@+id/btn_back" />
 
     <Space
         android:id="@+id/space1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/tv_title"
+        app:layout_constraintTop_toBottomOf="@+id/btn_back"
         app:layout_constraintBottom_toTopOf="@+id/battery_bar_container"
         app:layout_constraintVertical_weight="40" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/battery_bar_container"
         android:layout_width="match_parent"
-        android:layout_height="42dp"
+        android:layout_height="52dp"
         android:layout_marginHorizontal="24dp"
         android:background="@drawable/bg_border_black"
         app:layout_constraintTop_toBottomOf="@+id/space1"

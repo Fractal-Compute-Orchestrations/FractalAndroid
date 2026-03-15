@@ -61,15 +61,13 @@ class InsightsPagerFragment : Fragment() {
         }
 
         // 4. Make the diamonds clickable
-        binding.indicatorDevice.setOnClickListener { binding.viewPager.setCurrentItem(0, false) }
-        binding.indicatorHome.setOnClickListener { binding.viewPager.setCurrentItem(1, false) }
-        binding.indicatorModel.setOnClickListener { binding.viewPager.setCurrentItem(2, false) }
+        binding.indicatorUsage.setOnClickListener { binding.viewPager.setCurrentItem(0, false) }
+        binding.indicatorModel.setOnClickListener { binding.viewPager.setCurrentItem(1, false) }
     }
 
     private fun updateIndicators(position: Int) {
-        setIndicatorState(binding.indicatorDevice, position == 0)
-        setIndicatorState(binding.indicatorHome, position == 1)
-        setIndicatorState(binding.indicatorModel, position == 2)
+        setIndicatorState(binding.indicatorUsage, position == 0)
+        setIndicatorState(binding.indicatorModel, position == 1)
     }
 
     private fun setIndicatorState(imageView: ImageView, isSelected: Boolean) {

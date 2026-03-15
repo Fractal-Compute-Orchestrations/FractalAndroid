@@ -297,7 +297,7 @@ class ResourceStatsChartView @JvmOverloads constructor(
 
         val chartWidth = width - paddingLeft - paddingRight
         val chartHeight = height - paddingTop - paddingBottom
-        val barHeight = 29f * dp
+        val barHeight = 40f * dp
 
         val spacing = if (currentStats.size > 1) {
             (chartHeight - (barHeight * currentStats.size)) / (currentStats.size - 1)

@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.example.fractal.R;
 import com.example.fractal.databinding.FragmentDeviceBinding;
@@ -28,6 +29,7 @@ public class DeviceInsightsFragment extends Fragment {
         setupObservers();
 
         binding.btnOptimize.setOnClickListener(v -> viewModel.button_optimize());
+        binding.btnBack.setOnClickListener(v -> Navigation.findNavController(v).navigateUp());
 
         return binding.getRoot();
     }

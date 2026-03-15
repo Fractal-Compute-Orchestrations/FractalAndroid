@@ -1,114 +1,133 @@
 package com.example.fractal;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
-import java.util.HashMap;
-import java.util.Map;
+
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
+
+import androidx.navigation.NavOptions;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
-import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
-
-import androidx.appcompat.app.AppCompatDelegate;
 
 import com.example.fractal.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
-import android.content.Context;
-import android.graphics.Rect;
-import android.view.MotionEvent;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import androidx.appcompat.app.AppCompatActivity;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+
+    // SharedPreferences key prefix.
+    // We store the LAST email we successfully synced for each hardware ID.
+    // ─  ""                   → never synced before (send with "not_registered")
+    // ─  "Not Authenticated"  → synced but user not logged in yet
+    // ─  "<real email>"       → fully registered sync done
+    private static final String PREFS_NAME       = "fractal_device_prefs";
+    private static final String KEY_LAST_SYNCED  = "last_synced_email_";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        // 1. Inflate Layout
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         // =========================================================================
-        // FIREBASE REMOTE CONFIG INITIALIZATION (DYNAMIC SERVER URLS)
+        // FIX: FORCE STATUS BAR ICONS TO BE DARK GLOBALLY
+        // =========================================================================
+        WindowInsetsControllerCompat windowController = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
+        // 'true' means "the background is light, so use dark icons"
+        windowController.setAppearanceLightStatusBars(true);
+        // =========================================================================
+
+        // =========================================================================
+        // FIREBASE REMOTE CONFIG
         // =========================================================================
         FirebaseRemoteConfig mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
-                .setMinimumFetchIntervalInSeconds(3600) // Fetches from cloud once an hour
+                .setMinimumFetchIntervalInSeconds(3600)
                 .build();
         mFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
 
-        // 1. Set local fallback defaults (used if there is no internet on first launch)
         Map<String, Object> defaults = new HashMap<>();
         defaults.put("server_protocol", "https");
         defaults.put("server_ip", "fractal-grid.duckdns.org");
-        defaults.put("server_port", ""); // Empty because HTTPS automatically uses Port 443
+        defaults.put("server_port", "");
         mFirebaseRemoteConfig.setDefaultsAsync(defaults);
 
-        // 2. Fetch the latest live URLs from the Firebase Cloud
-        mFirebaseRemoteConfig.fetchAndActivate()
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        android.util.Log.i("RemoteConfig", "Cloud Server URLs updated successfully!");
-                    }
-                });
+        mFirebaseRemoteConfig.fetchAndActivate().addOnCompleteListener(this, task -> {
+            if (task.isSuccessful()) {
+                android.util.Log.i("RemoteConfig", "Cloud Server URLs updated successfully!");
+            }
+        });
         // =========================================================================
 
-        // 2. Safe View Lookups
-        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
-        View customHeader = findViewById(R.id.custom_header);
-        ImageButton headerDrawerButton = findViewById(R.id.header_drawer);
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        ImageView borderLine = findViewById(R.id.imageView);
+        DrawerLayout drawerLayout        = findViewById(R.id.drawer_layout);
+        View customHeader                = findViewById(R.id.custom_header);
+        ImageButton headerDrawerButton   = findViewById(R.id.header_drawer);
+        BottomNavigationView navView     = findViewById(R.id.nav_view);
+        ImageView borderLine             = findViewById(R.id.imageView);
 
-        // 3. Safe NavController Initialization
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment_activity_main);
-
         if (navHostFragment == null) return;
         NavController navController = navHostFragment.getNavController();
 
-
-        // 4. Custom Bottom Nav Setup
         if (navView != null) {
             navView.setOnItemSelectedListener(item -> {
                 int itemId = item.getItemId();
-                int currentDest = navController.getCurrentDestination() != null ? navController.getCurrentDestination().getId() : -1;
+                int currentDest = navController.getCurrentDestination() != null
+                        ? navController.getCurrentDestination().getId() : -1;
+
+                // =========================================================================
+                // NAV OPTIONS: INSTANT SWAP & BACKSTACK MANAGEMENT
+                // =========================================================================
+                NavOptions navOptions = new NavOptions.Builder()
+                        .setLaunchSingleTop(true)
+                        .setRestoreState(true)
+                        // We leave setEnterAnim/setExitAnim out for instant transitions.
+                        // This specific PopUpTo setup is what kills the Home screen flicker.
+                        .setPopUpTo(navController.getGraph().getStartDestinationId(), false, true)
+                        .build();
 
                 if (itemId == R.id.navigation_home) {
                     if (currentDest != R.id.navigation_home) {
-                        navController.navigate(R.id.navigation_home);
+                        navController.navigate(R.id.navigation_home, null, navOptions);
                     }
-                } else if (itemId == R.id.navigation_device || itemId == R.id.navigation_model) {
-                    int targetPage = (itemId == R.id.navigation_device) ? 0 : 2;
-
-                    // Navigate to the Pager host if we aren't already there
+                } else if (itemId == R.id.navigation_device) {
                     if (currentDest != R.id.navigation_device) {
-                        navController.navigate(R.id.navigation_device);
+                        navController.navigate(R.id.navigation_device, null, navOptions);
                     }
-
-                    // FIX: Always send the fragment result.
                     Bundle result = new Bundle();
-                    result.putInt("page", targetPage);
+                    result.putInt("page", 0);
                     getSupportFragmentManager().setFragmentResult("tab_change", result);
+                } else if (itemId == R.id.navigation_model) {
+                    if (currentDest != R.id.navigation_reward_bank) {
+                        navController.navigate(R.id.navigation_reward_bank, null, navOptions);
+                    }
                 }
 
                 navView.getMenu().findItem(itemId).setChecked(true);
@@ -116,49 +135,34 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             });
 
-            // Listen for user swiping the Pager
+            // Handle orchestration tab swipe (e.g., from a ViewPager in the Device fragment)
             getSupportFragmentManager().setFragmentResultListener("pager_swiped", this, (requestKey, bundle) -> {
                 int page = bundle.getInt("page");
-
-                if (page == 1) {
-                    // --- MIDDLE SCREEN: Deselect all tabs ---
-                    navView.getMenu().setGroupCheckable(0, true, false);
-                    for (int i = 0; i < navView.getMenu().size(); i++) {
-                        navView.getMenu().getItem(i).setChecked(false);
-                    }
-                    navView.getMenu().setGroupCheckable(0, true, true);
-
-                    // Passing -1 scales all icons back to their normal, unselected size
-                    navView.post(() -> animateNavIcons(navView, -1));
-                } else {
-                    // --- LEFT OR RIGHT SCREEN: Select Device or Model ---
-                    int targetId = (page == 0) ? R.id.navigation_device : R.id.navigation_model;
-                    navView.getMenu().findItem(targetId).setChecked(true);
-                    navView.post(() -> animateNavIcons(navView, targetId));
+                if (page == 0) {
+                    navView.getMenu().findItem(R.id.navigation_device).setChecked(true);
+                    navView.post(() -> animateNavIcons(navView, R.id.navigation_device));
                 }
             });
         }
 
         // =========================================================================
-        // AUTO-SEND REGISTERED DTO ON STARTUP (retries until success)
+        // AUTO-SEND REGISTERED DTO ON STARTUP
         // =========================================================================
         Context appContext = getApplicationContext();
 
         Thread registeredInfoSender = new Thread(() -> {
-
-            // ── STEP 1: Collect hardware data via RegistrationManager ────────────
+            // ── Step 1: Build hardware DTO ────────────────────────────────────
             AppBackend.Network.RegisteredInfo.RegistrationManager regManager =
                     new AppBackend.Network.RegisteredInfo.RegistrationManager(appContext);
 
             AppBackend.Network.RegisteredInfo.Registered_DTO dto =
                     regManager.generateNewRegistrationData();
 
-            android.util.Log.i("MainActivity", "Hardware DTO built → HW: " + dto.getHardwareID()
-                    + " | RAM: " + dto.getTotalRam()
-                    + " | Storage: " + dto.getStorage()
-                    + " | CPU: " + dto.getProcessor());
+            android.util.Log.i("MainActivity", "Hardware DTO → HW: " + dto.getHardwareID()
+                    + " | MAC: " + dto.getMacAddress()
+                    + " | RAM: " + dto.getTotalRam());
 
-            // ── STEP 2: Wait briefly for Firebase Auth to initialize (up to 5s) ──
+            // ── Step 2: Wait for Firebase Auth to initialise (up to 5 s) ─────
             com.google.firebase.auth.FirebaseAuth auth =
                     com.google.firebase.auth.FirebaseAuth.getInstance();
             int waited = 0;
@@ -170,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                 waited++;
             }
 
-            // ── STEP 3: Fill auth fields if logged in, leave defaults if not ─────
+            // ── Step 3: Fill auth fields ──────────────────────────────────────
             com.google.firebase.auth.FirebaseUser currentUser = auth.getCurrentUser();
             if (currentUser != null) {
                 try { currentUser.reload(); } catch (Exception ignored) {}
@@ -178,66 +182,62 @@ public class MainActivity extends AppCompatActivity {
                 dto.setUsername(currentUser.getDisplayName() != null
                         && !currentUser.getDisplayName().isEmpty()
                         ? currentUser.getDisplayName() : "Authorized User");
-
                 dto.setEmail(currentUser.getEmail() != null
                         ? currentUser.getEmail() : "Unknown Email");
-
                 dto.setJoinedOn(currentUser.getMetadata() != null
                         ? new java.text.SimpleDateFormat("dd MMM, yyyy", java.util.Locale.getDefault())
                         .format(new java.util.Date(currentUser.getMetadata().getCreationTimestamp()))
                         : "N/A");
-
+                dto.setStatus("registered");
                 android.util.Log.i("MainActivity", "Auth user found → " + dto.getEmail());
             } else {
-                // Not logged in — leave DTO defaults ("Loading...", etc.)
                 dto.setUsername("Unregistered Device");
                 dto.setEmail("Not Authenticated");
                 dto.setJoinedOn("N/A");
-                android.util.Log.i("MainActivity", "No auth user — sending hardware-only DTO.");
+                dto.setStatus("not_registered");
+                android.util.Log.i("MainActivity", "No auth user — hardware-only DTO.");
             }
 
-            android.util.Log.i("MainActivity", "Final DTO → " + dto.getEmail()
-                    + " | HW: " + dto.getHardwareID());
+            // ── Step 4: Check local flag — should we sync? ────────────────────
+            SharedPreferences prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            String syncKey          = KEY_LAST_SYNCED + dto.getHardwareID();
+            String lastSyncedEmail  = prefs.getString(syncKey, "");   // "" = never synced
 
-            // ── STEP 4: Only upload if doc doesn't exist OR email is "Not Authenticated" ─
+            boolean needsSync;
+            if (lastSyncedEmail.isEmpty()) {
+                // Fresh install or cache cleared — always sync
+                needsSync = true;
+                android.util.Log.i("MainActivity", "No previous sync record — will sync.");
+            } else if (lastSyncedEmail.equals(dto.getEmail())) {
+                // Nothing changed since last sync — skip
+                needsSync = false;
+                android.util.Log.i("MainActivity", "Email unchanged since last sync (" + dto.getEmail() + ") — skipping.");
+            } else {
+                // Email changed (e.g. user logged in since last launch) — sync
+                needsSync = true;
+                android.util.Log.i("MainActivity", "Email changed: '" + lastSyncedEmail
+                        + "' → '" + dto.getEmail() + "' — will sync.");
+            }
+
+            if (!needsSync) return;
+
+            // ── Step 5: Retry loop until Firestore confirms the write ─────────
             AppBackend.Network.Server_DAO.Server_DAO dao =
                     new AppBackend.Network.Server_DAO.Server_DAO();
             boolean sent = false;
+
             while (!sent) {
                 try {
-                    // Check if document already exists in Firestore
-                    com.google.firebase.firestore.FirebaseFirestore firestore =
-                            com.google.firebase.firestore.FirebaseFirestore.getInstance();
-                    com.google.firebase.firestore.DocumentSnapshot snapshot =
-                            com.google.android.gms.tasks.Tasks.await(
-                                    firestore.collection("registered_devices")
-                                            .document(dto.getHardwareID())
-                                            .get()
-                            );
+                    sent = dao.POST_SendRegisteredInfo(dto);
 
-                    boolean shouldUpload;
-                    if (!snapshot.exists()) {
-                        // Document doesn't exist at all — always upload
-                        shouldUpload = true;
-                        android.util.Log.i("MainActivity", "No existing doc found — will upload.");
+                    if (sent) {
+                        // Persist the email we just synced so we don't repeat
+                        prefs.edit().putString(syncKey, dto.getEmail()).apply();
+                        android.util.Log.i("MainActivity",
+                                "Sync confirmed. Cached email: " + dto.getEmail());
                     } else {
-                        // Document exists — only upload if the stored email is "Not Authenticated"
-                        String storedEmail = snapshot.getString("email");
-                        shouldUpload = "Not Authenticated".equals(storedEmail);
-                        android.util.Log.i("MainActivity", "Existing doc found. Stored email: "
-                                + storedEmail + " → shouldUpload: " + shouldUpload);
-                    }
-
-                    if (shouldUpload) {
-                        sent = dao.POST_SendRegisteredInfo(dto);
-                        if (!sent) {
-                            android.util.Log.w("MainActivity", "Send failed, retrying in 10s…");
-                            Thread.sleep(10_000);
-                        }
-                    } else {
-                        // Doc exists with a real email — no need to overwrite
-                        android.util.Log.i("MainActivity", "Doc already has valid email — skipping upload.");
-                        sent = true; // break the loop cleanly
+                        android.util.Log.w("MainActivity", "Send failed — retrying in 10 s…");
+                        Thread.sleep(10_000);
                     }
 
                 } catch (InterruptedException ie) {
@@ -256,7 +256,6 @@ public class MainActivity extends AppCompatActivity {
         registeredInfoSender.start();
         // =========================================================================
 
-        // 5. Sidebar Drawer Listener
         if (headerDrawerButton != null && drawerLayout != null) {
             headerDrawerButton.setOnClickListener(v -> {
                 if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -265,16 +264,22 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        // 6. Sidebar Navigation Logic
         View customSidebar = findViewById(R.id.custom_sidebar);
         if (customSidebar != null && drawerLayout != null) {
             ImageButton sidebarCloseBtn = customSidebar.findViewById(R.id.sidebar_close_btn);
-            if (sidebarCloseBtn != null) sidebarCloseBtn.setOnClickListener(v -> drawerLayout.closeDrawer(GravityCompat.START));
+            if (sidebarCloseBtn != null)
+                sidebarCloseBtn.setOnClickListener(v -> drawerLayout.closeDrawer(GravityCompat.START));
 
             View navSettings = customSidebar.findViewById(R.id.nav_item_settings);
             if (navSettings != null) navSettings.setOnClickListener(v -> {
                 drawerLayout.closeDrawer(GravityCompat.START);
                 navController.navigate(R.id.navigation_settings);
+            });
+
+            View navDeviceInsights = customSidebar.findViewById(R.id.nav_item_device_insights);
+            if (navDeviceInsights != null) navDeviceInsights.setOnClickListener(v -> {
+                drawerLayout.closeDrawer(GravityCompat.START);
+                navController.navigate(R.id.nav_device_insights);
             });
 
             View navAbout = customSidebar.findViewById(R.id.nav_item_about);
@@ -310,35 +315,40 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        // 7. Centralized Logic: Visibility & Colors
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            int destId = destination.getId();
-            boolean isGetStarted = (destId == R.id.navigation_get_started);
+            int destId       = destination.getId();
 
-            // A. Handle Visibility
-            if (isGetStarted) {
+            // Define destinations that need special header handling
+            boolean isGetStarted = (destId == R.id.navigation_get_started);
+            boolean isRewardBank = (destId == R.id.navigation_reward_bank);
+
+            // Hide the global header on Get Started AND the Reward Bank (to allow the liquid effect)
+            if (isGetStarted || isRewardBank) {
                 if (customHeader != null) customHeader.setVisibility(View.GONE);
-                if (navView != null) navView.setVisibility(View.GONE);
-                if (borderLine != null) borderLine.setVisibility(View.GONE);
+                if (navView      != null && isGetStarted) navView.setVisibility(View.GONE); // Keep nav bar on bank page
+                if (borderLine   != null) borderLine.setVisibility(View.GONE);
             } else {
                 if (customHeader != null) customHeader.setVisibility(View.VISIBLE);
-                if (navView != null) navView.setVisibility(View.VISIBLE);
-                if (borderLine != null) borderLine.setVisibility(View.VISIBLE);
+                if (navView      != null) navView.setVisibility(View.VISIBLE);
+                if (borderLine   != null) borderLine.setVisibility(View.VISIBLE);
             }
 
-            // B. Handle Dynamic Colors
-            boolean useBlackBar = (destId == R.id.navigation_about);
+            // ADDED THIS: Trigger dark bar for both About and Reward Bank
+            boolean useBlackBar = (destId == R.id.navigation_about || isRewardBank);
 
             if (navView != null) {
                 if (useBlackBar) {
-                    navView.setBackgroundColor(Color.parseColor("#000000"));
+                    // ADDED THIS: Use liquid hex #000000 for the Bank, pure black #000000 for About
+                    String darkColor = isRewardBank ? "#000000" : "#000000";
+
+                    navView.setBackgroundColor(Color.parseColor(darkColor));
                     ColorStateList whiteIcons = AppCompatResources.getColorStateList(MainActivity.this, R.color.nav_colors_black_bg);
                     navView.setItemIconTintList(whiteIcons);
                     navView.setItemTextColor(whiteIcons);
 
                     if (borderLine != null) {
                         borderLine.setBackgroundTintList(null);
-                        borderLine.setBackgroundColor(Color.parseColor("#000000"));
+                        borderLine.setBackgroundColor(Color.parseColor(darkColor));
                         borderLine.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
                         int padding = (int) (getResources().getDisplayMetrics().widthPixels * 0.38);
                         borderLine.setPadding(padding, 0, padding, 0);
@@ -359,14 +369,14 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                // C. Sync Initial/Default Selection State
                 if (!isGetStarted) {
                     if (destId == R.id.navigation_home) {
                         navView.getMenu().findItem(destId).setChecked(true);
                         navView.post(() -> animateNavIcons(navView, destId));
-                    } else if (destId == R.id.navigation_device) {
-                        // Handled manually
-                    } else {
+                    } else if (destId == R.id.navigation_reward_bank) {
+                        navView.getMenu().findItem(R.id.navigation_model).setChecked(true);
+                        navView.post(() -> animateNavIcons(navView, R.id.navigation_model));
+                    } else if (destId != R.id.navigation_device) {
                         navView.getMenu().setGroupCheckable(0, true, false);
                         for (int i = 0; i < navView.getMenu().size(); i++) {
                             navView.getMenu().getItem(i).setChecked(false);
@@ -379,10 +389,20 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        android.content.res.Configuration override =
+                new android.content.res.Configuration(newBase.getResources().getConfiguration());
+        override.fontScale = 1.0f;
+        override.densityDpi = (int) (override.densityDpi * 0.85f);
+        Context context = newBase.createConfigurationContext(override);
+        super.attachBaseContext(context);
+    }
+
     private void animateNavIcons(BottomNavigationView navView, int selectedId) {
         if (navView == null) return;
         for (int i = 0; i < navView.getMenu().size(); i++) {
-            int itemId = navView.getMenu().getItem(i).getItemId();
+            int itemId   = navView.getMenu().getItem(i).getItemId();
             View itemView = navView.findViewById(itemId);
             if (itemView != null) {
                 boolean isSelected = (itemId == selectedId);
@@ -400,19 +420,13 @@ public class MainActivity extends AppCompatActivity {
             if (v instanceof EditText) {
                 Rect outRect = new Rect();
                 v.getGlobalVisibleRect(outRect);
-                // If the user tapped OUTSIDE the active EditText
                 if (!outRect.contains((int) event.getRawX(), (int) event.getRawY())) {
-                    // Force the EditText to lose focus
                     v.clearFocus();
-                    // Hide the soft keyboard automatically
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    if (imm != null) {
-                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                    }
+                    if (imm != null) imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
                 }
             }
         }
         return super.dispatchTouchEvent(event);
     }
-
 }

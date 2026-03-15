@@ -23,25 +23,17 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <ImageView
-            android:id="@+id/indicator_device"
-            android:layout_width="21dp"
-            android:layout_height="34dp"
+            android:id="@+id/indicator_usage"
+            android:layout_width="19dp"
+            android:layout_height="31dp"
             android:layout_marginEnd="16dp"
             android:src="@drawable/ic_diamond_indicator_selected"
             app:tint="#000000" />
 
         <ImageView
-            android:id="@+id/indicator_home"
-            android:layout_width="21dp"
-            android:layout_height="34dp"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/ic_diamond_indicator_deselected"
-            app:tint="#000000" />
-
-        <ImageView
             android:id="@+id/indicator_model"
-            android:layout_width="21dp"
-            android:layout_height="34dp"
+            android:layout_width="19dp"
+            android:layout_height="31dp"
             android:src="@drawable/ic_diamond_indicator_deselected"
             app:tint="#000000" />
     </LinearLayout>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="notif_ink">#181818</color>
+    <color name="notif_bg">#FFFFFF</color>
+    <color name="notif_track">#E0E0E0</color>
+</resources>

@@ -35,10 +35,22 @@
         tools:layout="@layout/fragment_insights_pager" />
 
     <fragment
+        android:id="@+id/navigation_reward_bank"
+        android:name="AppFrontend.Interface.RewardBank.RewardBank_Fragment"
+        android:label="Internet Bank"
+        tools:layout="@layout/fragment_reward_bank" />
+
+    <fragment
         android:id="@+id/navigation_model"
         android:name="AppFrontend.Interface.Insights.ModelTraining.ModelTrainingFragment"
         android:label="@string/title_model"
         tools:layout="@layout/fragment_model" />
+
+    <fragment
+        android:id="@+id/nav_device_insights"
+        android:name="AppFrontend.Interface.Insights.DeviceInsights.DeviceInsightsFragment"
+        android:label="Device Insights"
+        tools:layout="@layout/fragment_device" />
 
     <fragment
         android:id="@+id/navigation_registered_info"

@@ -9,14 +9,13 @@ import AppFrontend.Interface.Insights.UsageInsights.UsageInsights_Fragment
 class InsightsPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
     // 0 = Usage Insights (Heartbeat), 1 = Device Insights (Battery), 2 = Model Training (Waves)
-    override fun getItemCount(): Int = 3
+    override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> UsageInsights_Fragment()   // The first screen (Left Tab)
-            1 -> DeviceInsightsFragment()   // The middle screen (Center Tab)
-            2 -> ModelTrainingFragment()    // The third screen (Right Tab)
-            else -> DeviceInsightsFragment()
+            0 -> UsageInsights_Fragment()   // The first screen (Left Tab) // The middle screen (Center Tab)
+            1 -> ModelTrainingFragment()    // The third screen (Right Tab)
+            else -> ModelTrainingFragment()
         }
     }
 }

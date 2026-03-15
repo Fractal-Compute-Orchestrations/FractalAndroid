@@ -7,23 +7,14 @@ import AppBackend.Network.networkConfig_ini
 import AppBackend.TaskContainer.Image_Task
 import AppBackend.TaskContainer.Task
 import AppBackend.TaskContainer.TaskType
-
 import AppFrontend.Interface.Auth.DeviceAuthorization.LoginRegister_DTO
 import AppFrontend.Interface.Auth.DeviceUnregister.Unregister_DTO
 import AppFrontend.Interface.Auth.ForgetPassword.ForgetPassword_DTO
-
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
-
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
-
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.DataOutputStream
 import java.io.File
@@ -31,13 +22,16 @@ import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import android.util.Base64
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import org.json.JSONObject
 
 class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : Auth, ModelTransmission, TaskPopulate {
 
     private val TAG = "Server_DAO"
 
-    fun POST_Ping(taskID: String, pingStatus: Boolean){ }
+    fun POST_Ping(taskID: String, pingStatus: Boolean) {}
 
     override fun GET_Task(flushPrevious: Boolean, deviceId: String): Task? {
         try {
@@ -60,17 +54,13 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                 val json = JSONObject(response)
                 val task = Image_Task()
 
-
                 task.task_Id = json.optString("task_Id", "-1")
-
-                // 2. Task Type
                 task.taskType = if (json.optString("taskType") == "ActiveTask") TaskType.ActiveTask else TaskType.PassiveTask
 
-                // 3. Expiration Date
                 val dateString = json.optString("task_expire_date", "")
                 if (dateString.isNotEmpty()) {
                     try {
-                        val format = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+                        val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                         task.task_expire_date = format.parse(dateString) ?: Date()
                     } catch (e: Exception) {
                         task.task_expire_date = Date()
@@ -79,20 +69,17 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                     task.task_expire_date = Date()
                 }
 
-                // 4. Bools and Strings
                 task.task_completion_status = json.optBoolean("task_completion_status", false)
                 task.CKPT_FILENAME = json.optString("CKPT_FILENAME", "checkpoint.ckpt")
                 task.MODEL_FILENAME = json.optString("MODEL_FILENAME", "model_server.tflite")
                 task.TRAIN_IMAGES_FILENAME = json.optString("TRAIN_IMAGES_FILENAME", "train_images_server.bin")
                 task.TRAIN_LABELS_FILENAME = json.optString("TRAIN_LABELS_FILENAME", "train_labels_server.bin")
 
-                // 5. Integers
                 task.NUM_EPOCHS = json.optInt("NUM_EPOCHS", 20)
                 task.BATCH_SIZE = json.optInt("BATCH_SIZE", 100)
                 task.NUM_TRAININGS = json.optInt("NUM_TRAININGS", 6000)
                 task.NUM_CLASSES = json.optInt("NUM_CLASSES", 10)
 
-                // 6. JSON Arrays
                 val trainingTypeJsonArray = json.optJSONArray("training_type")
                 val trainingTypeList = mutableListOf<String>()
                 if (trainingTypeJsonArray != null) {
@@ -111,7 +98,6 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                     task.INPUT_SHAPE = shapeList
                 }
 
-                // 7. JSON Objects (Tensors)
                 val inputTensorJson = json.optJSONObject("input_tensor_name")
                 val inputMap = mutableMapOf<List<String>, Any>()
                 inputTensorJson?.keys()?.forEach { key ->
@@ -126,9 +112,6 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                 }
                 task.output_tensor_name = outputMap
 
-                // ==========================================================
-                // COMPREHENSIVE FIELD LOGGING
-                // ==========================================================
                 Log.i(TAG, "================ POPULATED TASK DETAILS ================")
                 Log.i(TAG, "task_Id:                  ${task.task_Id}")
                 Log.i(TAG, "taskType:                 ${task.taskType}")
@@ -254,6 +237,11 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
         return false
     }
 
+    // =========================================================================
+    // POST_RegisterLogin
+    // After a successful login OR registration, we immediately push a full
+    // "registered" DTO so the device document is updated in Firestore.
+    // =========================================================================
     override fun POST_RegisterLogin(registeredDto: Registered_DTO, loginregisterDto: LoginRegister_DTO): Boolean {
         val auth = FirebaseAuth.getInstance()
         val email = loginregisterDto.email
@@ -261,7 +249,7 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
         val username = loginregisterDto.username
 
         try {
-            // 1. ATTEMPT LOGIN FIRST
+            // ── 1. ATTEMPT LOGIN ────────────────────────────────────────────────
             val loginTask = auth.signInWithEmailAndPassword(email, password)
             Tasks.await(loginTask)
 
@@ -269,7 +257,18 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
             user?.reload()?.let { Tasks.await(it) }
 
             if (user != null && user.isEmailVerified) {
-                Log.i(TAG, "Login Successful and Email is Verified!")
+                Log.i(TAG, "Login successful and email is verified!")
+
+                // ── Push updated "registered" DTO now that we have auth data ────
+                registeredDto.username = user.displayName?.takeIf { it.isNotEmpty() } ?: username
+                registeredDto.email    = user.email ?: email
+                registeredDto.joinedOn = user.metadata?.creationTimestamp?.let { ts ->
+                    SimpleDateFormat("dd MMM, yyyy", Locale.getDefault()).format(Date(ts))
+                } ?: "N/A"
+                registeredDto.status   = "registered"
+                POST_SendRegisteredInfo(registeredDto)
+                Log.i(TAG, "Registered DTO updated to 'registered' for: ${registeredDto.email}")
+
                 return true
             } else {
                 try {
@@ -286,7 +285,7 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                 throw loginException
             }
 
-            // 2. REGISTRATION FALLBACK
+            // ── 2. REGISTRATION FALLBACK ────────────────────────────────────────
             try {
                 val regTask = auth.createUserWithEmailAndPassword(email, password)
                 Tasks.await(regTask)
@@ -297,32 +296,27 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                     .build()
                 user?.updateProfile(profileUpdates)?.let { Tasks.await(it) }
 
-                // ── Save user profile to Firestore keyed by email ─────────────────
                 try {
                     val firestore = FirebaseFirestore.getInstance()
+
+                    // ── Save user profile to /users/{email} ──────────────────────
                     val userData = hashMapOf(
                         "username" to username,
                         "email"    to email
                     )
-                    val firestoreTask = firestore
-                        .collection("users")
-                        .document(email)
-                        .set(userData)
-                    Tasks.await(firestoreTask)
+                    Tasks.await(firestore.collection("users").document(email).set(userData))
                     Log.i(TAG, "User profile saved to Firestore for: $email")
 
-                    // ── Send full registered DTO now that Firebase fields are known ─
+                    // ── Push full "registered" DTO immediately ───────────────────
                     registeredDto.username = username
                     registeredDto.email    = email
-                    registeredDto.joinedOn = user?.metadata?.creationTimestamp?.let { timestamp ->
-                        java.text.SimpleDateFormat("dd MMM, yyyy", java.util.Locale.getDefault())
-                            .format(java.util.Date(timestamp))
+                    registeredDto.joinedOn = user?.metadata?.creationTimestamp?.let { ts ->
+                        SimpleDateFormat("dd MMM, yyyy", Locale.getDefault()).format(Date(ts))
                     } ?: "N/A"
+                    registeredDto.status   = "registered"
                     POST_SendRegisteredInfo(registeredDto)
-                    // ──────────────────────────────────────────────────────────────
 
                 } catch (e: Exception) {
-                    // Non-fatal — auth still succeeded, don't block registration
                     Log.w(TAG, "Firestore profile save failed (non-fatal): ${e.message}")
                 }
 
@@ -339,7 +333,8 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                     throw regException
                 }
 
-                if (regException is FirebaseAuthUserCollisionException || regException.message?.contains("email address is already in use") == true) {
+                if (regException is FirebaseAuthUserCollisionException ||
+                    regException.message?.contains("email address is already in use") == true) {
                     throw Exception("Incorrect password for existing account.")
                 } else {
                     throw Exception(regException.localizedMessage ?: "Registration Failed.")
@@ -352,19 +347,17 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
         val user = FirebaseAuth.getInstance().currentUser
 
         if (user != null) {
-            // User is logged in, pull their data
             registeredDto.username = if (!user.displayName.isNullOrEmpty()) user.displayName!! else "Authorized User"
-            registeredDto.email = user.email ?: "Unknown Email"
-
-            registeredDto.joinedOn = user.metadata?.creationTimestamp?.let { timestamp ->
-                val sdf = java.text.SimpleDateFormat("dd MMM, yyyy", java.util.Locale.getDefault())
-                sdf.format(java.util.Date(timestamp))
+            registeredDto.email    = user.email ?: "Unknown Email"
+            registeredDto.joinedOn = user.metadata?.creationTimestamp?.let { ts ->
+                SimpleDateFormat("dd MMM, yyyy", Locale.getDefault()).format(Date(ts))
             } ?: "N/A"
+            registeredDto.status   = "registered"
         } else {
-            // User is NOT logged in, provide clean fallback text
             registeredDto.username = "Unregistered Device"
-            registeredDto.email = "Not Authenticated"
+            registeredDto.email    = "Not Authenticated"
             registeredDto.joinedOn = "N/A"
+            registeredDto.status   = "not_registered"
         }
 
         return registeredDto
@@ -380,36 +373,34 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
             throw Exception("Email address is missing.")
         }
 
-        // Notice we removed the try-catch here.
-        // If it fails, it will throw the exact Firebase error straight to the ViewModel!
         Log.i(TAG, "Requesting Firebase to send password reset link to: $targetEmail")
-
         val resetTask = auth.sendPasswordResetEmail(targetEmail)
-        com.google.android.gms.tasks.Tasks.await(resetTask)
-
+        Tasks.await(resetTask)
         Log.i(TAG, "Reset email sent successfully!")
         return true
     }
 
+    // =========================================================================
+    // POST_Unregister
+    // Saves feedback (with MAC address) to the correct collection, then marks
+    // the device document as "unregistered" in registered_devices.
+    // =========================================================================
     override fun POST_Unregister(registeredDto: Registered_DTO, feedbackDto: Unregister_DTO): Boolean {
         val auth = FirebaseAuth.getInstance()
         val user = auth.currentUser
 
         try {
-            val firestore = FirebaseFirestore.getInstance()
+            val firestore  = FirebaseFirestore.getInstance()
+            val userEmail  = user?.email ?: registeredDto.email
+            val currentDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
 
-            // Fallback to "Anonymous" if they aren't logged in
-            val userEmail = user?.email ?: registeredDto.email
-            val currentDate = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
-
-            // 1. Payload Size Guardrail
+            // ── 1. Payload Size Guardrail ───────────────────────────────────────
             val base64Images = mutableListOf<String>()
             var currentPayloadSize = 0
-            val maxSafePayloadSize = 800_000 // 800KB safe zone
+            val maxSafePayloadSize = 800_000
 
             for (imageBytes in feedbackDto.screenshots) {
                 val base64String = android.util.Base64.encodeToString(imageBytes, android.util.Base64.DEFAULT)
-
                 if (currentPayloadSize + base64String.length < maxSafePayloadSize) {
                     base64Images.add(base64String)
                     currentPayloadSize += base64String.length
@@ -419,47 +410,78 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                 }
             }
 
-            // 2. Prepare the document
+            // ── 2. Build the feedback document ─────────────────────────────────
+            //    MAC address is always included per spec.
             val feedbackData = hashMapOf(
-                "email" to userEmail,
-                "submissionDate" to currentDate,
-                "problemTitle" to feedbackDto.problemTitle,
-                "description" to feedbackDto.description,
-                "screenshotsBase64" to base64Images,
-                "hardwareId" to registeredDto.hardwareID,
-                "username" to registeredDto.username,
+                "email"               to userEmail,
+                "macAddress"          to registeredDto.macAddress,   // ← always included
+                "hardwareId"          to registeredDto.hardwareID,
+                "username"            to registeredDto.username,
+                "submissionDate"      to currentDate,
+                "problemTitle"        to feedbackDto.problemTitle,
+                "description"         to feedbackDto.description,
+                "screenshotsBase64"   to base64Images,
                 "requestedUnregister" to feedbackDto.wantsToUnregister
             )
 
-            // 3. DYNAMIC COLLECTION ROUTING
-            val targetCollection = if (feedbackDto.wantsToUnregister) {
-                "unregistered_feedback"
-            } else {
-                "app_feedback"
-            }
+            // ── 3. Route to the correct collection ─────────────────────────────
+            val targetCollection = if (feedbackDto.wantsToUnregister) "unregistered_feedback" else "app_feedback"
+            Log.i(TAG, "Uploading feedback to '$targetCollection' for MAC: ${registeredDto.macAddress}")
+            Tasks.await(firestore.collection(targetCollection).add(feedbackData))
+            Log.i(TAG, "Feedback upload successful.")
 
-            Log.i(TAG, "Attempting upload to $targetCollection...")
-            val firestoreTask = firestore.collection(targetCollection).add(feedbackData)
-            com.google.android.gms.tasks.Tasks.await(firestoreTask)
-            Log.i(TAG, "Firestore upload successful.")
+            // ── 4. If unregistering: update device status to "unregistered" ────
+            if (feedbackDto.wantsToUnregister) {
+                try {
+                    val statusUpdate = mapOf(
+                        "status"            to "unregistered",
+                        "unregisteredEmail" to userEmail,
+                        "unregisteredAt"    to currentDate,
+                        "macAddress"        to registeredDto.macAddress
+                    )
+                    Tasks.await(
+                        firestore.collection("registered_devices")
+                            .document(registeredDto.hardwareID)
+                            .update(statusUpdate)
+                    )
+                    Log.i(TAG, "Device ${registeredDto.hardwareID} marked as 'unregistered'.")
+                } catch (e: Exception) {
+                    // Non-fatal: feedback was already saved — log and continue
+                    Log.w(TAG, "Failed to update device status to 'unregistered' (non-fatal): ${e.message}")
+                }
 
-            // 4. CONDITIONAL SIGN OUT
-            if (user != null && feedbackDto.wantsToUnregister) {
-                Log.i(TAG, "User requested unregistration. Proceeding to sign out...")
-                auth.signOut()
+                // ── 5. Sign out ─────────────────────────────────────────────────
+                if (user != null) {
+                    Log.i(TAG, "Signing out after unregistration.")
+                    auth.signOut()
+                }
             }
 
             return true
 
         } catch (e: Exception) {
-            Log.e(TAG, "CRITICAL: Upload failed. Error: ${e.message}")
+            Log.e(TAG, "POST_Unregister failed: ${e.message}")
             return false
         }
     }
 
+    // =========================================================================
+    // POST_SendRegisteredInfo
+    // Writes the full device document to registered_devices/{hardwareId}.
+    // The status field is derived from the DTO: if email is "Not Authenticated"
+    // the status is forced to "not_registered" regardless of what was set.
+    // =========================================================================
     fun POST_SendRegisteredInfo(registeredDto: Registered_DTO): Boolean {
         return try {
             val firestore = FirebaseFirestore.getInstance()
+
+            // Derive the correct status from the email so it is always consistent
+            val resolvedStatus = when {
+                registeredDto.email == "Not Authenticated" ||
+                        registeredDto.email == "Loading..."        -> "not_registered"
+                registeredDto.status == "unregistered"     -> "unregistered"
+                else                                       -> "registered"
+            }
 
             val data = hashMapOf(
                 "username"       to registeredDto.username,
@@ -473,19 +495,18 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                 "totalRam"       to registeredDto.totalRam,
                 "androidVersion" to registeredDto.androidVersion,
                 "macAddress"     to registeredDto.macAddress,
-                "sentAt"         to java.text.SimpleDateFormat(
-                    "yyyy-MM-dd HH:mm:ss",
-                    java.util.Locale.getDefault()
-                ).format(java.util.Date())
+                "status"         to resolvedStatus,           // ← always written
+                "sentAt"         to SimpleDateFormat(
+                    "yyyy-MM-dd HH:mm:ss", Locale.getDefault()
+                ).format(Date())
             )
 
-            val task = firestore
-                .collection("registered_devices")
-                .document(registeredDto.hardwareID)
-                .set(data)
-
-            com.google.android.gms.tasks.Tasks.await(task)
-            Log.i(TAG, "POST_SendRegisteredInfo → Firestore write successful.")
+            Tasks.await(
+                firestore.collection("registered_devices")
+                    .document(registeredDto.hardwareID)
+                    .set(data)
+            )
+            Log.i(TAG, "POST_SendRegisteredInfo → success. status=$resolvedStatus email=${registeredDto.email}")
             true
         } catch (e: Exception) {
             Log.e(TAG, "POST_SendRegisteredInfo failed: ${e.message}")

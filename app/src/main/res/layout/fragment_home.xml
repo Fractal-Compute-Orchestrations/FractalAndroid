@@ -49,7 +49,7 @@
                 android:letterSpacing="0.24"
                 android:text="inactive"
                 android:textAlignment="center"
-                android:textSize="24sp" />
+                android:textSize="18dp" />
 
             <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="76" />
 
@@ -60,7 +60,7 @@
                 android:text="Computation Usage: --%"
                 android:textAlignment="center"
                 android:letterSpacing="0.16"
-                android:textSize="18sp" />
+                android:textSize="17dp"/>
 
             <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="4" />
 
@@ -71,7 +71,7 @@
                 android:letterSpacing="0.16"
                 android:text="Processor Usage: --%"
                 android:textAlignment="center"
-                android:textSize="18sp" />
+                android:textSize="17dp" />
 
             <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="4" />
 
@@ -82,7 +82,7 @@
                 android:letterSpacing="0.16"
                 android:text="Ram Usage: --%"
                 android:textAlignment="center"
-                android:textSize="18sp" />
+                android:textSize="17dp" />
 
             <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="4" />
 
@@ -93,7 +93,7 @@
                 android:letterSpacing="0.16"
                 android:text="System Temperature: --°C"
                 android:textAlignment="center"
-                android:textSize="18sp" />
+                android:textSize="17dp" />
 
             <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="40" />
 

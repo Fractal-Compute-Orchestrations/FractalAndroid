@@ -24,9 +24,9 @@ class Orchestrator(private val context: Context) {
 
         val globalState = (context.applicationContext as FractalApplication).globalState
 
-//        val serverIp = globalState.server?.networkConfig?.SERVER_IP ?: "192.168.43.76"
-//        val serverPort = globalState.server?.networkConfig?.SERVER_PORT ?: "5001"
-        val deviceId = android.provider.Settings.Secure.getString(context.contentResolver, android.provider.Settings.Secure.ANDROID_ID) ?: "unknown_device"
+        val deviceId = android.provider.Settings.Secure.getString(
+            context.contentResolver, android.provider.Settings.Secure.ANDROID_ID
+        ) ?: "unknown_device"
 
         Log.i(TAG, "=========================================")
         Log.i(TAG, " STARTING FRACTAL TRAINING PIPELINE")
@@ -42,10 +42,9 @@ class Orchestrator(private val context: Context) {
                 callback.onStatusUpdate("Evaluating device state...")
 
                 if (!opControl.waitForOptimalConditions(callback)) {
-                    return // Exit the thread completely if user cancelled
+                    return
                 }
 
-                // Step 1: Infinite Task Fetch Loop
                 // Step 1: Infinite Task Fetch Loop
                 var task: Task? = null
                 var attemptCount = 1
@@ -54,28 +53,26 @@ class Orchestrator(private val context: Context) {
                     // Pause Trap
                     while (callback.isPaused() == true) {
                         if (callback.isCancelled()) return
-                        callback.onStatusUpdate("Task Search Paused")
+                        callback.onStatusUpdate("Grid Search Paused")
                         Thread.sleep(500)
                     }
                     if (callback.isCancelled() == true) return
 
-                    callback.onStatusUpdate("Checking network for task fetch...")
+                    callback.onStatusUpdate("Checking for internet payload...")
                     if (!opControl.waitForNetworkToUpload(callback)) return
 
-                    callback.onStatusUpdate(if (attemptCount == 1) "Fetching task from server..." else "Searching for task (Attempt $attemptCount)...")
+                    callback.onStatusUpdate(
+                        if (attemptCount == 1) "Locating optimal Internet chunk..."
+                        else "Scanning grid for payload (Attempt $attemptCount)..."
+                    )
                     task = globalState.server?.GET_Task(true, deviceId)
 
                     if (task != null) {
                         if (task.task_expire_date != null && task.task_expire_date.before(java.util.Date())) {
-                            Log.w(TAG, "Task ${task.task_Id} has expired (${task.task_expire_date}). Flushing and skipping.")
-                            callback.onStatusUpdate("Task Expired. Flushing...")
-
-                            // Wipe any leftover files from this dead task
+                            Log.w(TAG, "Task ${task.task_Id} has expired. Flushing and skipping.")
+                            callback.onStatusUpdate("Payload Expired. Flushing...")
                             AppFrontend.Flush.Flusher().flushAll(task)
-
-                            task = null // Destroy the task so the loop fetches a new one
-
-                            // Smart-sleep for 10 seconds before asking the server again
+                            task = null
                             for (i in 0 until 100) {
                                 if (callback.isCancelled() == true) return
                                 if (callback.isPaused() == true) break
@@ -84,13 +81,10 @@ class Orchestrator(private val context: Context) {
                             attemptCount++
                             continue
                         }
-                        // ----------------------------------
-
                         Log.i(TAG, "Task ${task.task_Id} acquired.")
                         break
                     } else {
-                        // Server offline or 403 (No tasks available for this device)
-                        callback.onStatusUpdate("Server offline or no task\nRetrying in 10s...")
+                        callback.onStatusUpdate("Grid quiet. Re-scanning...")
                         for (i in 0 until 100) {
                             if (callback.isCancelled() == true) return
                             if (callback.isPaused() == true) break
@@ -107,26 +101,31 @@ class Orchestrator(private val context: Context) {
                 var needsDownload = true
 
                 if (task is Image_Task) {
-                    val modelFile = File(context.filesDir, task.MODEL_FILENAME)
+                    val modelFile  = File(context.filesDir, task.MODEL_FILENAME)
                     val imagesFile = File(context.filesDir, task.TRAIN_IMAGES_FILENAME)
                     val labelsFile = File(context.filesDir, task.TRAIN_LABELS_FILENAME)
 
-                    if (modelFile.exists() && modelFile.length() > 0 &&
+                    if (modelFile.exists()  && modelFile.length()  > 0 &&
                         imagesFile.exists() && imagesFile.length() > 0 &&
                         labelsFile.exists() && labelsFile.length() > 0) {
-                        callback?.onStatusUpdate("Local files found. Skipping download...")
+                        callback?.onStatusUpdate("Local cache found. Preparing synthesis...")
                         needsDownload = false
                         downloadSuccess = true
                     }
                 }
 
                 if (needsDownload) {
-                    callback?.onStatusUpdate("Downloading training resources...")
-
-                    // THIS is the line that was missing!
+                    callback?.onStatusUpdate("Gulping Internet Chunk...")
                     val latch = CountDownLatch(1)
 
                     if (task is Image_Task) {
+
+                        // ── Wire the callback's pause/cancel state into the downloader ──
+                        val pauseController = object : DataDownloader_naf.PauseController {
+                            override fun isPaused(): Boolean   = callback?.isPaused()   == true
+                            override fun isCancelled(): Boolean = callback?.isCancelled() == true
+                        }
+
                         DataDownloader_naf.downloadFiles(
                             context,
                             task.TRAIN_IMAGES_FILENAME,
@@ -143,12 +142,20 @@ class Orchestrator(private val context: Context) {
                                     latch.countDown()
                                 }
                                 override fun onProgressUpdate(percentage: Int) {
-                                    // Pushes the live percentage straight to your UI!
-                                    callback?.onStatusUpdate("Downloading resources... $percentage%")
+                                    callback?.onStatusUpdate("Gulping Internet chunk... $percentage%")
                                 }
-                            }
+                                // ── Forward the paused status to the UI ──────────────
+                                override fun onStatusMessage(message: String) {
+                                    callback?.onStatusUpdate(message)
+                                }
+                            },
+                            pauseController  // ← pass the controller
                         )
-                        latch.await() // Pauses Orchestrator until download is 100% done
+                        latch.await()
+
+                        // ── Instant exit if the user cancelled during the download ──
+                        if (callback?.isCancelled() == true) return
+
                     } else {
                         Log.e(TAG, "Task is not an Image_Task. Cannot proceed with download.")
                         downloadSuccess = false
@@ -156,19 +163,18 @@ class Orchestrator(private val context: Context) {
                 }
 
                 if (!downloadSuccess) {
-                    callback?.onStatusUpdate("Error: Download failed")
-                    // Instead of killing the master loop, we break this iteration and wait 10s before trying again
+                    callback?.onStatusUpdate("Error: Payload retrieval failed")
                     Thread.sleep(10000)
                     continue
                 }
 
                 // Step 3: Assembling the Engine
-                callback.onStatusUpdate("Assembling training engine...")
+                callback.onStatusUpdate("Assembling synthesis engine...")
                 val trainingPreferences = task.training_type.toTypedArray()
                 val packageTypeTrainer = globalState.packageTypeTrainerBuilder?.make(context, trainingPreferences)
 
                 if (packageTypeTrainer == null) {
-                    callback.onStatusUpdate("Error: Engine build failed")
+                    callback.onStatusUpdate("Error: Engine assembly failed")
                     Thread.sleep(10000)
                     continue
                 }
@@ -176,24 +182,16 @@ class Orchestrator(private val context: Context) {
                 // Step 4: Execute Pipeline (Train -> Validate -> Upload -> Flush)
                 packageTypeTrainer.run(task, callback)
 
-                // =======================================================================
                 // Step 5: The Cooldown Phase
-                // If we reach here, a full task was completed (or gracefully failed).
-                // We rest for 30 seconds before pinging the server for the NEXT task.
-                // =======================================================================
                 if (callback.isCancelled() == false) {
                     Log.i(TAG, "Task ${task.task_Id} complete. Entering cooldown phase.")
                     callback.onStatusUpdate("Process Complete\nCooling down (15s)...")
-
-                    // Reset the diamond progress visually for the next task
                     callback.onProgress(0)
 
-                    // 30-Second Smart Sleep
                     for (i in 0 until 100) {
                         if (callback.isCancelled() == true) return
                         if (callback.isPaused() == true) {
-                            // If user pauses during cooldown, hold here until they resume
-                            while(callback.isPaused()) {
+                            while (callback.isPaused()) {
                                 if (callback.isCancelled()) return
                                 Thread.sleep(500)
                             }
@@ -205,7 +203,6 @@ class Orchestrator(private val context: Context) {
             } catch (e: Exception) {
                 Log.e(TAG, "Pipeline encountered an error: ${e.message}")
                 callback?.onStatusUpdate("Error: ${e.message}")
-                // If the whole pipeline crashes, wait 10 seconds before automatically restarting the master loop
                 Thread.sleep(10000)
             }
         }

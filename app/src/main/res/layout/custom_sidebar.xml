@@ -59,6 +59,18 @@
                 android:textColor="#FFFFFF"
                 android:textSize="18dp" />
 
+                <TextView
+                    android:id="@+id/nav_item_device_insights"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:fontFamily="@font/genos_regular"
+                    android:letterSpacing="0.1"
+                    android:padding="8dp"
+                    android:text="Device Insights"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18dp" />
+
             <TextView
                 android:id="@+id/nav_item_about"
                 android:layout_width="wrap_content"
@@ -71,17 +83,7 @@
                 android:textColor="#FFFFFF"
                 android:textSize="18dp" />
 
-            <TextView
-                android:id="@+id/nav_item_rate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:fontFamily="@font/genos_regular"
-                android:letterSpacing="0.1"
-                android:padding="8dp"
-                android:text="Rate Us"
-                android:textColor="#FFFFFF"
-                android:textSize="18dp" />
+
         </LinearLayout>
 
             <Space

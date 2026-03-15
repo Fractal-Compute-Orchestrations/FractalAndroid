@@ -10,7 +10,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false">
 
         <include
             android:id="@+id/custom_header"
@@ -45,6 +47,9 @@
             android:layout_width="0dp"
             android:layout_height="108dp"
             android:background="#00FFFFFF"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            app:paddingBottomSystemWindowInsets="false"
             app:itemActiveIndicatorStyle="@null"
             app:itemIconSize="24dp"
             app:itemIconTint="@null"

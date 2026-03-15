@@ -62,10 +62,15 @@ public class ModelTrainingFragment extends Fragment {
 
         // 1. Observe Stats
         sharedViewModel.getDetailedStats().observe(getViewLifecycleOwner(), stats -> {
-            binding.tvOverallPerf.setText("Overall Performance: " + stats.getOverallPerformance());
+//            binding.tvOverallPerf.setText("Overall Performance: " + stats.getOverallPerformance());
+//            binding.tvEstTime.setText("Estimated Time Left: " + stats.getEstimatedTimeLeft());
+//            binding.tvEpochs.setText("Epochs Completed: " + stats.getEpochsCompleted());
+//            binding.tvInference.setText("Inference Testing: " + stats.getInferenceTesting());
+
+            binding.tvOverallPerf.setText("Generation Rate: " + stats.getOverallPerformance());
             binding.tvEstTime.setText("Estimated Time Left: " + stats.getEstimatedTimeLeft());
-            binding.tvEpochs.setText("Epochs Completed: " + stats.getEpochsCompleted());
-            binding.tvInference.setText("Inference Testing: " + stats.getInferenceTesting());
+            binding.tvEpochs.setText("Chunks Digested: " + stats.getEpochsCompleted());
+            binding.tvInference.setText("Verifying Output: " + stats.getInferenceTesting());
         });
 
         // 2. Observe State to control the Wave Animation

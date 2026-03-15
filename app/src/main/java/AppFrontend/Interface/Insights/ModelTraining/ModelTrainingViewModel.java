@@ -10,7 +10,8 @@ public class ModelTrainingViewModel extends ViewModel {
 
     public ModelTrainingViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("Model Training Details");
+//        mText.setValue("Model Training Details");
+        mText.setValue("Internet Synthesis");
     }
 
     public LiveData<String> getText() {
