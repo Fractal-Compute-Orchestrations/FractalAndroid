@@ -44,6 +44,9 @@ The "Fractal" name reflects the project's vision: small, self-similar units of i
 
 Fractal is engineered with a strict decoupling of telemetry monitoring, execution engines, and presentation layers. This ensures stability and modularity at scale.
 
+> [!TIP]
+> For a comprehensive, low-level technical breakdown of the system's internal wiring, the [Master Architecture Diagram](docs/diagrams/architecture.drawio) is available. This file can be viewed or edited using [app.diagrams.net](https://app.diagrams.net/).
+
 ```mermaid
 graph TD
     subgraph Cloud [Aggregation Server]
