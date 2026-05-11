@@ -46,3 +46,8 @@ google-services.json
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Build Artifacts
+app/release/
+*.aab
+*.apk
