@@ -24,6 +24,26 @@ class FileOperations(val context: Context) {
         Log.d(TAG, "writeJson(): Successfully wrote to $fileName")
     }
 
+    // Java-callable version (reified inline functions are invisible to Java)
+    fun <T> readJson(fileName: String, clazz: Class<T>): T? {
+        val file = File(context.filesDir, fileName)
+        Log.d(TAG, "readJson(java): Checking if $fileName exists...")
+        if (!file.exists()) {
+            Log.w(TAG, "readJson(java): File $fileName does NOT exist.")
+            return null
+        }
+        return try {
+            val json = file.readText()
+            Log.d(TAG, "readJson(java): Raw JSON -> $json")
+            val obj = gson.fromJson(json, clazz)
+            Log.d(TAG, "readJson(java): Parsed -> $obj")
+            obj
+        } catch (e: Exception) {
+            Log.e(TAG, "readJson(java): ERROR reading $fileName", e)
+            null
+        }
+    }
+
     // ----------------------------------------------------
     // READ JSON
     // ----------------------------------------------------

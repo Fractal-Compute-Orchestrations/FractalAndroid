@@ -30,9 +30,13 @@ class Settings_Fragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[Settings_ViewModel::class.java]
-
-        setupInitialState()
         setupListeners()
+    }
+
+    // ── THE FIX: Move to onResume so it refreshes after notification clicks ──
+    override fun onResume() {
+        super.onResume()
+        setupInitialState()
     }
 
     private fun setupInitialState() {
@@ -51,10 +55,8 @@ class Settings_Fragment : Fragment() {
     }
 
     private fun setupListeners() {
-        // Back Button
         binding.btnBack.setOnClickListener { findNavController().navigateUp() }
 
-        // Toggles (At least one must be selected)
         binding.btnWifi.setOnClickListener {
             viewModel.toggleWifi()
             updateIcon(binding.btnWifi, viewModel.getConfig().onWifi)
@@ -69,27 +71,24 @@ class Settings_Fragment : Fragment() {
             viewModel.toggleOvernight()
             updateIcon(binding.btnOvernight, viewModel.getConfig().overNightUtilization)
         }
+
         binding.btnIdle.setOnClickListener {
             viewModel.toggleIdle()
             updateIcon(binding.btnIdle, viewModel.getConfig().idleTimeUtilization)
         }
+
         binding.btnChargingExclusive.setOnClickListener {
             viewModel.toggleChargingExclusive()
             updateIcon(binding.btnChargingExclusive, viewModel.getConfig().onChargingExclusive)
         }
 
-        // --- SLIDER LOGIC ---
         binding.sliderCharge.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 updateLabelText(progress)
             }
-
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                seekBar?.let {
-                    viewModel.updateChargeLimit(it.progress)
-                }
+                seekBar?.let { viewModel.updateChargeLimit(it.progress) }
             }
         })
     }
@@ -113,7 +112,5 @@ class Settings_Fragment : Fragment() {
         _binding = null
     }
 
-    fun event_updateSettings(){
-
-    }
+    fun event_updateSettings(){}
 }

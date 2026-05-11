@@ -37,11 +37,12 @@ class RegistrationManager(private val context: Context) {
 
     fun generateNewRegistrationData(): Registered_DTO {
         return Registered_DTO(
-            // These will be overridden by the Server_DAO
             username = "Loading...",
             email = "Loading...",
+            phoneNumber = "Unknown",
+            carrier = "Unknown",
+            timeZone = java.util.TimeZone.getDefault().id, // <-- Captures local timezone (e.g., "Asia/Karachi")
             joinedOn = "Loading...",
-
             platform = "Android",
             hardwareID = getHardwareId(),
             serialNumber = getSerial(),

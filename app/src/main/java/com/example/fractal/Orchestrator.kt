@@ -81,7 +81,14 @@ class Orchestrator(private val context: Context) {
                             attemptCount++
                             continue
                         }
+
                         Log.i(TAG, "Task ${task.task_Id} acquired.")
+                        Log.i(TAG, "Engine Architecture: ${task.architecture} | Reward Rate: ${task.reward_rate} MB")
+
+                        // --- NEW: Pass the full task back to the caller immediately ---
+                        // This allows the UI to update the Architecture text before downloading even starts
+                        callback.onTaskAcquired(task)
+
                         break
                     } else {
                         callback.onStatusUpdate("Grid quiet. Re-scanning...")
@@ -180,6 +187,7 @@ class Orchestrator(private val context: Context) {
                 }
 
                 // Step 4: Execute Pipeline (Train -> Validate -> Upload -> Flush)
+                // The task object passed here now contains your reward_rate!
                 packageTypeTrainer.run(task, callback)
 
                 // Step 5: The Cooldown Phase

@@ -80,6 +80,11 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                 task.NUM_TRAININGS = json.optInt("NUM_TRAININGS", 6000)
                 task.NUM_CLASSES = json.optInt("NUM_CLASSES", 10)
 
+                // --- NEW FIELDS PARSED HERE ---
+                task.architecture = json.optString("architecture", "Unknown")
+                task.reward_rate = json.optDouble("reward_rate", 0.0)
+                // ------------------------------
+
                 val trainingTypeJsonArray = json.optJSONArray("training_type")
                 val trainingTypeList = mutableListOf<String>()
                 if (trainingTypeJsonArray != null) {
@@ -115,6 +120,8 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                 Log.i(TAG, "================ POPULATED TASK DETAILS ================")
                 Log.i(TAG, "task_Id:                  ${task.task_Id}")
                 Log.i(TAG, "taskType:                 ${task.taskType}")
+                Log.i(TAG, "architecture:             ${task.architecture}")      // Added to logs
+                Log.i(TAG, "reward_rate (MBs):        ${task.reward_rate}")       // Added to logs
                 Log.i(TAG, "task_expire_date:         ${task.task_expire_date}")
                 Log.i(TAG, "task_completion_status:   ${task.task_completion_status}")
                 Log.i(TAG, "CKPT_FILENAME:            ${task.CKPT_FILENAME}")
@@ -152,25 +159,7 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
             return false
         }
 
-        val taskJson = JSONObject().apply {
-            put("task_Id", taskId)
-            put("taskType", if (imageTask.taskType == TaskType.ActiveTask) "ActiveTask" else "PassiveTask")
-
-            val trainingArray = org.json.JSONArray()
-            imageTask.training_type.forEach { trainingArray.put(it) }
-            put("training_type", trainingArray)
-
-            put("CKPT_FILENAME", imageTask.CKPT_FILENAME)
-            put("MODEL_FILENAME", imageTask.MODEL_FILENAME)
-            put("NUM_EPOCHS", imageTask.NUM_EPOCHS)
-            put("BATCH_SIZE", imageTask.BATCH_SIZE)
-            put("NUM_TRAININGS", imageTask.NUM_TRAININGS)
-            put("NUM_CLASSES", imageTask.NUM_CLASSES)
-
-            val shapeArray = org.json.JSONArray()
-            imageTask.INPUT_SHAPE.forEach { shapeArray.put(it) }
-            put("INPUT_SHAPE", shapeArray)
-        }
+        // --- TASK JSON BUILDING BLOCK COMPLETELY REMOVED ---
 
         val boundary = "FormBoundary" + System.currentTimeMillis()
         val lineEnd = "\r\n"
@@ -193,16 +182,15 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                 dos.write(text.toByteArray(Charsets.UTF_8))
             }
 
+            // 1. Send the task_Id as a simple text field
             writeTextPart(twoHyphens + boundary + lineEnd)
             writeTextPart("Content-Disposition: form-data; name=\"task_Id\"" + lineEnd)
             writeTextPart(lineEnd)
             writeTextPart(taskId.toString() + lineEnd)
 
-            writeTextPart(twoHyphens + boundary + lineEnd)
-            writeTextPart("Content-Disposition: form-data; name=\"task_json\"" + lineEnd)
-            writeTextPart(lineEnd)
-            writeTextPart(taskJson.toString() + lineEnd)
+            // --- JSON MULTIPART SECTION COMPLETELY REMOVED ---
 
+            // 2. Send the actual .ckpt model file bytes
             writeTextPart(twoHyphens + boundary + lineEnd)
             writeTextPart("Content-Disposition: form-data; name=\"model_file\"; filename=\"$ckptFilename\"" + lineEnd)
             writeTextPart("Content-Type: application/octet-stream" + lineEnd)
@@ -226,7 +214,8 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
 
             val responseCode = conn.responseCode
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                Log.i(TAG, "Server accepted the uploaded model and JSON successfully!")
+                // Updated log message to reflect the new payload
+                Log.i(TAG, "Server accepted the uploaded model successfully!")
                 return true
             } else {
                 Log.e(TAG, "Server rejected the upload. HTTP Response Code: $responseCode")
@@ -244,35 +233,57 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
     // =========================================================================
     override fun POST_RegisterLogin(registeredDto: Registered_DTO, loginregisterDto: LoginRegister_DTO): Boolean {
         val auth = FirebaseAuth.getInstance()
+        val firestore = com.google.firebase.firestore.FirebaseFirestore.getInstance()
         val email = loginregisterDto.email
         val password = loginregisterDto.password
         val username = loginregisterDto.username
+        val phone = loginregisterDto.phoneNumber
+        val carrier = loginregisterDto.carrier
 
         try {
             // ── 1. ATTEMPT LOGIN ────────────────────────────────────────────────
             val loginTask = auth.signInWithEmailAndPassword(email, password)
-            Tasks.await(loginTask)
+            com.google.android.gms.tasks.Tasks.await(loginTask)
 
             val user = auth.currentUser
-            user?.reload()?.let { Tasks.await(it) }
+            user?.reload()?.let { com.google.android.gms.tasks.Tasks.await(it) }
 
             if (user != null && user.isEmailVerified) {
                 Log.i(TAG, "Login successful and email is verified!")
 
-                // ── Push updated "registered" DTO now that we have auth data ────
-                registeredDto.username = user.displayName?.takeIf { it.isNotEmpty() } ?: username
-                registeredDto.email    = user.email ?: email
+                // ── OVERWRITE/UPDATE USER INFO IN FIRESTORE ON LOGIN ─────────────
+                val userData = hashMapOf(
+                    "username" to (user.displayName?.takeIf { it.isNotEmpty() } ?: username),
+                    "email"    to (user.email ?: email),
+                    "phone"    to phone,
+                    "carrier"  to carrier,
+                    "timeZone" to java.util.TimeZone.getDefault().id
+                )
+
+                // Use set() to overwrite or merge() if you want to preserve other existing fields
+                com.google.android.gms.tasks.Tasks.await(
+                    firestore.collection("users").document(email).set(userData, com.google.firebase.firestore.SetOptions.merge())
+                )
+                Log.i(TAG, "User profile overwritten/merged in Firestore for: $email")
+
+                // Push updated "registered" DTO now that we have auth data
+                registeredDto.username = userData["username"] as String
+                registeredDto.email    = userData["email"] as String
+                registeredDto.phoneNumber = phone
+                registeredDto.carrier = carrier
+                registeredDto.timeZone = userData["timeZone"] as String
                 registeredDto.joinedOn = user.metadata?.creationTimestamp?.let { ts ->
                     SimpleDateFormat("dd MMM, yyyy", Locale.getDefault()).format(Date(ts))
                 } ?: "N/A"
                 registeredDto.status   = "registered"
-                POST_SendRegisteredInfo(registeredDto)
-                Log.i(TAG, "Registered DTO updated to 'registered' for: ${registeredDto.email}")
 
+                POST_SendRegisteredInfo(registeredDto)
                 return true
+
             } else {
+                // ... (keep verification email logic)
                 try {
-                    user?.sendEmailVerification()?.let { Tasks.await(it) }
+                    user?.sendEmailVerification()?.let { com.google.android.gms.tasks.Tasks.await(it) }
                 } catch (e: Exception) {
                     Log.w(TAG, "Email already sent recently, skipping resend.")
                 }
@@ -280,7 +291,7 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
             }
 
         } catch (loginException: Exception) {
-
+            // ... (keep verification check and registration fallback)
             if (loginException.message?.startsWith("AWAITING_VERIFICATION:") == true) {
                 throw loginException
             }
@@ -288,40 +299,40 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
             // ── 2. REGISTRATION FALLBACK ────────────────────────────────────────
             try {
                 val regTask = auth.createUserWithEmailAndPassword(email, password)
-                Tasks.await(regTask)
+                com.google.android.gms.tasks.Tasks.await(regTask)
 
                 val user = auth.currentUser
-                val profileUpdates = UserProfileChangeRequest.Builder()
+                val profileUpdates = com.google.firebase.auth.UserProfileChangeRequest.Builder()
                     .setDisplayName(username)
                     .build()
-                user?.updateProfile(profileUpdates)?.let { Tasks.await(it) }
+                user?.updateProfile(profileUpdates)?.let { com.google.android.gms.tasks.Tasks.await(it) }
+
+                // ── Save FULL user profile to /users/{email} ──────────────────────
+                val userData = hashMapOf(
+                    "username" to username,
+                    "email"    to email,
+                    "phone"    to phone,
+                    "carrier"  to carrier,
+                    "timeZone" to java.util.TimeZone.getDefault().id
+                )
+                com.google.android.gms.tasks.Tasks.await(firestore.collection("users").document(email).set(userData))
+                Log.i(TAG, "User profile saved to Firestore during registration for: $email")
+
+                // ── Update and send DTO ──────────────────────────────────────────
+                registeredDto.username = username
+                registeredDto.email    = email
+                registeredDto.phoneNumber = phone
+                registeredDto.carrier = carrier
+                registeredDto.timeZone = userData["timeZone"] as String
+                registeredDto.joinedOn = user?.metadata?.creationTimestamp?.let { ts ->
+                    SimpleDateFormat("dd MMM, yyyy", Locale.getDefault()).format(Date(ts))
+                } ?: "N/A"
+                registeredDto.status   = "registered"
+
+                POST_SendRegisteredInfo(registeredDto)
 
                 try {
-                    val firestore = FirebaseFirestore.getInstance()
-
-                    // ── Save user profile to /users/{email} ──────────────────────
-                    val userData = hashMapOf(
-                        "username" to username,
-                        "email"    to email
-                    )
-                    Tasks.await(firestore.collection("users").document(email).set(userData))
-                    Log.i(TAG, "User profile saved to Firestore for: $email")
-
-                    // ── Push full "registered" DTO immediately ───────────────────
-                    registeredDto.username = username
-                    registeredDto.email    = email
-                    registeredDto.joinedOn = user?.metadata?.creationTimestamp?.let { ts ->
-                        SimpleDateFormat("dd MMM, yyyy", Locale.getDefault()).format(Date(ts))
-                    } ?: "N/A"
-                    registeredDto.status   = "registered"
-                    POST_SendRegisteredInfo(registeredDto)
-
-                } catch (e: Exception) {
-                    Log.w(TAG, "Firestore profile save failed (non-fatal): ${e.message}")
-                }
-
-                try {
-                    user?.sendEmailVerification()?.let { Tasks.await(it) }
+                    user?.sendEmailVerification()?.let { com.google.android.gms.tasks.Tasks.await(it) }
                 } catch (e: Exception) {
                     Log.w(TAG, "Failed to send initial verification email: ${e.message}")
                 }
@@ -329,11 +340,11 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                 throw Exception("AWAITING_VERIFICATION:Account created! Check inbox ($email) to verify.")
 
             } catch (regException: Exception) {
+                // ... (keep exception handling)
                 if (regException.message?.startsWith("AWAITING_VERIFICATION:") == true) {
                     throw regException
                 }
-
-                if (regException is FirebaseAuthUserCollisionException ||
+                if (regException is com.google.firebase.auth.FirebaseAuthUserCollisionException ||
                     regException.message?.contains("email address is already in use") == true) {
                     throw Exception("Incorrect password for existing account.")
                 } else {
@@ -349,13 +360,18 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
         if (user != null) {
             registeredDto.username = if (!user.displayName.isNullOrEmpty()) user.displayName!! else "Authorized User"
             registeredDto.email    = user.email ?: "Unknown Email"
+            registeredDto.timeZone = java.util.TimeZone.getDefault().id // <-- NEW: Capture live timezone
             registeredDto.joinedOn = user.metadata?.creationTimestamp?.let { ts ->
                 SimpleDateFormat("dd MMM, yyyy", Locale.getDefault()).format(Date(ts))
             } ?: "N/A"
             registeredDto.status   = "registered"
+
+            // Note: phoneNumber and carrier aren't fetched here because they live in Firestore,
+            // not in the basic Auth object. They are fetched by your background sync thread!
         } else {
             registeredDto.username = "Unregistered Device"
             registeredDto.email    = "Not Authenticated"
+            registeredDto.timeZone = java.util.TimeZone.getDefault().id // <-- NEW: Capture live timezone
             registeredDto.joinedOn = "N/A"
             registeredDto.status   = "not_registered"
         }
@@ -380,11 +396,29 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
         return true
     }
 
-    // =========================================================================
-    // POST_Unregister
-    // Saves feedback (with MAC address) to the correct collection, then marks
-    // the device document as "unregistered" in registered_devices.
-    // =========================================================================
+    // Add this to AppBackend/Network/Server_DAO/Server_DAO.kt
+
+    fun GET_VerifiedLiquidMBs(email: String): Float {
+        return try {
+            val firestore = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+
+            // Fetch the user's document synchronously (we will call this from a background thread)
+            val doc = com.google.android.gms.tasks.Tasks.await(
+                firestore.collection("users").document(email).get()
+            )
+
+            if (doc.exists() && doc.contains("liquid_mbs")) {
+                // Return the server-validated MBs
+                doc.getDouble("liquid_mbs")?.toFloat() ?: 0f
+            } else {
+                0f // If the field doesn't exist yet, they have 0 MBs
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("Server_DAO", "Failed to fetch liquid MBs: ${e.message}")
+            -1f // Return -1 to indicate a network/server error
+        }
+    }
+
     override fun POST_Unregister(registeredDto: Registered_DTO, feedbackDto: Unregister_DTO): Boolean {
         val auth = FirebaseAuth.getInstance()
         val user = auth.currentUser
@@ -465,12 +499,6 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
         }
     }
 
-    // =========================================================================
-    // POST_SendRegisteredInfo
-    // Writes the full device document to registered_devices/{hardwareId}.
-    // The status field is derived from the DTO: if email is "Not Authenticated"
-    // the status is forced to "not_registered" regardless of what was set.
-    // =========================================================================
     fun POST_SendRegisteredInfo(registeredDto: Registered_DTO): Boolean {
         return try {
             val firestore = FirebaseFirestore.getInstance()
@@ -486,6 +514,9 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
             val data = hashMapOf(
                 "username"       to registeredDto.username,
                 "email"          to registeredDto.email,
+                "phoneNumber"    to registeredDto.phoneNumber, // <-- NEW
+                "carrier"        to registeredDto.carrier,     // <-- NEW
+                "timeZone"       to registeredDto.timeZone,    // <-- NEW
                 "joinedOn"       to registeredDto.joinedOn,
                 "platform"       to registeredDto.platform,
                 "hardwareId"     to registeredDto.hardwareID,
@@ -501,15 +532,15 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                 ).format(Date())
             )
 
-            Tasks.await(
+            com.google.android.gms.tasks.Tasks.await(
                 firestore.collection("registered_devices")
                     .document(registeredDto.hardwareID)
                     .set(data)
             )
-            Log.i(TAG, "POST_SendRegisteredInfo → success. status=$resolvedStatus email=${registeredDto.email}")
+            android.util.Log.i("Server_DAO", "POST_SendRegisteredInfo → success. status=$resolvedStatus email=${registeredDto.email}")
             true
         } catch (e: Exception) {
-            Log.e(TAG, "POST_SendRegisteredInfo failed: ${e.message}")
+            android.util.Log.e("Server_DAO", "POST_SendRegisteredInfo failed: ${e.message}")
             false
         }
     }

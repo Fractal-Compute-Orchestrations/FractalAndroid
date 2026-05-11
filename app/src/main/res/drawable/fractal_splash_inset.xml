@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-  
-</selector>
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/fractal_logo"
+    android:insetLeft="88dp"
+    android:insetRight="88dp"
+    android:insetTop="88dp"
+    android:insetBottom="88dp">
+</inset>

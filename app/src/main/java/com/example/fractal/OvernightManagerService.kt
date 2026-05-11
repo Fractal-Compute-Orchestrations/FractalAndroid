@@ -5,7 +5,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
@@ -35,7 +34,8 @@ class OvernightManagerService : Service() {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val repo get() = TrainingStateRepository.getInstance()
 
-    // ── Lifecycle ────────────────────────────────────────────────────────────
+    private var isManagingCurrentWindow = false
+    private var isFirstRun = true
 
     override fun onCreate() {
         super.onCreate()
@@ -44,109 +44,120 @@ class OvernightManagerService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP) {
-            // Update Config to reflect the user turning it off via the notification
-            val fileOps = FileOperations(this)
-            val config = fileOps.readJson<app_config>("app_config.json")
+            val app = applicationContext as? FractalApplication
+            val config = app?.globalState?.appConfig ?: FileOperations(this).readJson<app_config>("app_config.json")
+
             if (config != null) {
                 config.overNightUtilization = false
-                fileOps.writeJson("app_config.json", config)
+                FileOperations(this).writeJson("app_config.json", config)
+                app?.globalState?.appConfig = config
             }
             stopForeground(true)
             stopSelf()
             return START_NOT_STICKY
         }
 
-        // Immediately promote to foreground so Android cannot kill us
-        startForeground(NOTIFICATION_ID, buildNotification("Overnight Supervisor Active", "Calculating schedule..."))
-
-        // Start the monitoring loop
+        // VISIBILITY: Friendly, clear system state
+        startForeground(NOTIFICATION_ID, buildNotification("Overnight Mode: Enabled", "Waiting for the scheduled time window..."))
         scope.launch { runOvernightLoop() }
-
-        return START_STICKY // Android restarts the service if it ever dies
+        return START_STICKY
     }
 
     override fun onDestroy() {
         scope.cancel()
-        pauseTrainingIfRunning() // Clean up on intentional stop
         super.onDestroy()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    // ── Core loop ────────────────────────────────────────────────────────────
-
     private suspend fun runOvernightLoop() {
-        while (isActive) {
+        while (scope.isActive) {
             val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
 
+            if (isFirstRun) {
+                isManagingCurrentWindow = false
+                isFirstRun = false
+            }
+
             when {
-                // ── Overnight window: midnight → 8 AM ──────────────────────
+                // ── Active Window: Midnight → 8 AM ──────────────────────
                 hour in 0..7 -> {
-                    if (!repo.isActive && !repo.isPaused) {
-                        startTraining()
-                        updateNotification("Overnight Supervisor Active", "🌙 Training window is open and running.")
-                    } else if (repo.isActive) {
-                        updateNotification("Overnight Supervisor Active", "🌙 Training is currently running.")
+                    if (!isManagingCurrentWindow) {
+                        if (!repo.isActive) {
+                            startGeneration()
+                        } else if (repo.isPaused) {
+                            resumeGeneration()
+                        }
+                        isManagingCurrentWindow = true
+                    }
+
+                    // FEEDBACK: Simple "What is it doing right now?" language
+                    if (repo.isActive && !repo.isPaused) {
+                        updateNotification("Overnight Mode: Active", "Status: Generating internet rewards for you.")
                     } else {
-                        // Manually paused by user — respect it
-                        updateNotification("Overnight Supervisor Active", "⏸ Training paused by user. Will not auto-resume.")
+                        updateNotification("Overnight Mode: Paused", "Status: Generation paused. Tap 'Resume' in the app to continue.")
                     }
                 }
 
-                // ── Past 8 AM: pause if still running ──────────────────────
-                hour >= 8 && repo.isActive && !repo.isPaused -> {
-                    pauseTrainingIfRunning()
-                    updateNotification("Overnight Supervisor Active", "☀️ Training paused (Outside 00:00 - 08:00 window).")
-                }
-
-                // ── Daytime idle ───────────────────────────────────────────
+                // ── Standby Window: 8 AM → Midnight ──────────────────────
                 else -> {
+                    if (isManagingCurrentWindow) {
+                        pauseForDaytime()
+                        isManagingCurrentWindow = false
+                    }
+
+                    // MAPPING: Clear countdown to when the "Work" starts again
                     val minutesUntilMidnight = minutesUntil(0)
-                    updateNotification("Overnight Supervisor Active", "⏰ Next window opens in ${formatCountdown(minutesUntilMidnight)}")
+                    updateNotification("Overnight Mode: Standby", "Next generation window starts in ${formatCountdown(minutesUntilMidnight)}.")
                 }
             }
-
-            delay(60_000L) // Re-check every 60 seconds
+            delay(10_000L)
         }
     }
 
-    // ── Training control ─────────────────────────────────────────────────────
+    // ── Generation control (Friendly Language) ────────────────────────────────
 
-    private fun startTraining() {
+    private fun startGeneration() {
         repo.isActive = true
         repo.isWaiting = true
         repo.isPaused = false
-        repo.statusMessage.postValue("Overnight Training Initiated...")
+        repo.statusMessage.postValue("Overnight Mode: Starting Reward Generation...")
 
         val startIntent = Intent(this, FractalTrainingService::class.java).apply {
             action = "ACTION_START_TRAINING"
         }
         ContextCompat.startForegroundService(this, startIntent)
-        android.util.Log.i("OvernightManager", "Training started by Supervisor")
     }
 
-    private fun pauseTrainingIfRunning() {
+    private fun resumeGeneration() {
+        repo.isPaused = false
+        repo.statusMessage.postValue("Overnight Mode: Resuming Reward Generation...")
+
+        val resumeIntent = Intent(this, FractalTrainingService::class.java).apply {
+            action = "RESUME_SERVICE"
+        }
+        startService(resumeIntent)
+    }
+
+    private fun pauseForDaytime() {
         if (!repo.isActive) return
         repo.isPaused = true
-        repo.statusMessage.postValue("Overnight Training Paused (8 AM limit)")
+        repo.statusMessage.postValue("Overnight Mode: Window Closed (08:00 AM)")
 
         val pauseIntent = Intent(this, FractalTrainingService::class.java).apply {
             action = "PAUSE_SERVICE"
         }
         startService(pauseIntent)
-        android.util.Log.i("OvernightManager", "Training paused by Supervisor")
     }
-
-    // ── Notification helpers ──────────────────────────────────────────────────
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Overnight Training Manager",
-                NotificationManager.IMPORTANCE_LOW // Silent, but visible
+                "Overnight Mode",
+                NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Keeps overnight training on schedule"
+                description = "Keeps your internet reward generation on schedule."
                 setShowBadge(false)
             }
             getSystemService(NotificationManager::class.java)?.createNotificationChannel(channel)
@@ -154,7 +165,6 @@ class OvernightManagerService : Service() {
     }
 
     private fun buildNotification(title: String, text: String): Notification {
-        // Tap opens the app
         val openAppIntent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
@@ -162,31 +172,26 @@ class OvernightManagerService : Service() {
             this, 0, openAppIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // "Turn off" action in the notification itself
         val stopIntent = Intent(this, OvernightManagerService::class.java).apply { action = ACTION_STOP }
         val stopPendingIntent = PendingIntent.getService(
             this, 1, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val accentColor = Color.parseColor("#181818") // Use your theme color
-
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(text)
-            .setSmallIcon(R.drawable.fractal_logo) // Ensure this is your vector logo
+            .setSmallIcon(R.drawable.fractal_logo)
             .setContentIntent(openAppPending)
             .setOngoing(true)
             .setSilent(true)
-            .setColor(accentColor)
-            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Disable Supervisor", stopPendingIntent)
+            .setColor(Color.parseColor("#181818"))
+            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Turn Off Overnight Mode", stopPendingIntent)
             .build()
     }
 
     private fun updateNotification(title: String, text: String) {
         getSystemService(NotificationManager::class.java)?.notify(NOTIFICATION_ID, buildNotification(title, text))
     }
-
-    // ── Time utilities ────────────────────────────────────────────────────────
 
     private fun minutesUntil(targetHour: Int): Long {
         val now = Calendar.getInstance()

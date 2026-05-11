@@ -47,6 +47,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import AppBackend.TaskContainer.Task;
 import com.example.fractal.databinding.FragmentModelBinding;
 import AppFrontend.Interface.Home.HomeViewModel;
 
@@ -62,11 +63,6 @@ public class ModelTrainingFragment extends Fragment {
 
         // 1. Observe Stats
         sharedViewModel.getDetailedStats().observe(getViewLifecycleOwner(), stats -> {
-//            binding.tvOverallPerf.setText("Overall Performance: " + stats.getOverallPerformance());
-//            binding.tvEstTime.setText("Estimated Time Left: " + stats.getEstimatedTimeLeft());
-//            binding.tvEpochs.setText("Epochs Completed: " + stats.getEpochsCompleted());
-//            binding.tvInference.setText("Inference Testing: " + stats.getInferenceTesting());
-
             binding.tvOverallPerf.setText("Generation Rate: " + stats.getOverallPerformance());
             binding.tvEstTime.setText("Estimated Time Left: " + stats.getEstimatedTimeLeft());
             binding.tvEpochs.setText("Chunks Digested: " + stats.getEpochsCompleted());
@@ -76,8 +72,6 @@ public class ModelTrainingFragment extends Fragment {
         // 2. Observe State to control the Wave Animation
         sharedViewModel.getStatusMessage().observe(getViewLifecycleOwner(), msg -> {
             if (msg != null && binding.waveVisualization != null) {
-
-                // FIX: Expanded the checks to catch Paused, Cancelled, and Aborted states!
                 boolean isTrainingActive = !msg.equals("inactive")
                         && !msg.equals("Process Complete")
                         && !msg.equals("Process Cancelled")
@@ -86,6 +80,13 @@ public class ModelTrainingFragment extends Fragment {
                         && !msg.startsWith("Error");
 
                 binding.waveVisualization.setActive(isTrainingActive);
+            }
+        });
+
+        // 3. NEW: Observe the Architecture Model from the server
+        sharedViewModel.getArchitectureModel().observe(getViewLifecycleOwner(), architectureName -> {
+            if (binding.tvModelMode != null) {
+                binding.tvModelMode.setText(architectureName);
             }
         });
 

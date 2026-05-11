@@ -1,32 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/fractal_splash_inset</item>
+        <item name="windowSplashScreenAnimationDuration">200</item>
+        <item name="postSplashScreenTheme">@style/Theme.Fractal</item>
+    </style>
+
     <style name="Theme.Fractal" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Backgrounds: Pure white canvas -->
         <item name="android:windowBackground">@color/white</item>
         <item name="colorSurface">@color/white</item>
         <item name="colorSurfaceVariant">@color/white</item>
-
-        <!-- Text/Icons: Black on white -->
         <item name="colorOnSurface">@color/black</item>
         <item name="colorOnSurfaceVariant">@color/black</item>
-
-        <!-- Primary (accents like buttons): Black for contrast -->
         <item name="colorPrimary">@color/black</item>
-        <item name="colorPrimaryVariant">@color/black</item>
-        <item name="colorOnPrimary">@color/white</item>  <!-- White text on black buttons -->
-
-        <!-- Secondary: Dark gray -->
+        <item name="colorOnPrimary">@color/white</item>
         <item name="colorSecondary">@color/black</item>
-        <item name="colorSecondaryVariant">@color/black</item>
         <item name="colorOnSecondary">@color/white</item>
-
-        <!-- Status bar: Base (no light flag—falls back on API <23) -->
         <item name="android:statusBarColor">@color/white</item>
-
-        <!-- App-wide font: Genos family -->
         <item name="android:fontFamily">@font/genos_family</item>
 
-        <!-- Material3 text styles: Override with Genos -->
         <item name="textAppearanceBodyLarge">@style/TextAppearance.Fractal.BodyLarge</item>
         <item name="textAppearanceBodyMedium">@style/TextAppearance.Fractal.BodyMedium</item>
         <item name="textAppearanceBodySmall">@style/TextAppearance.Fractal.BodySmall</item>
@@ -34,14 +28,9 @@
         <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Fractal.HeadlineMedium</item>
         <item name="textAppearanceTitleLarge">@style/TextAppearance.Fractal.TitleLarge</item>
         <item name="textAppearanceTitleMedium">@style/TextAppearance.Fractal.TitleMedium</item>
-
-        <!-- Button font override -->
         <item name="materialButtonStyle">@style/Fractal.Button</item>
-
-        <!-- Customize your theme here. -->
     </style>
 
-    <!-- Custom text appearances with Genos -->
     <style name="TextAppearance.Fractal.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
         <item name="android:fontFamily">@font/genos_family</item>
     </style>
@@ -52,19 +41,6 @@
 
     <style name="TextAppearance.Fractal.BodySmall" parent="TextAppearance.Material3.BodySmall">
         <item name="android:fontFamily">@font/genos_family</item>
-    </style>
-
-    <style name="SidebarCutShape" parent="">
-        <item name="cornerFamilyTopRight">cut</item>
-        <item name="cornerSizeTopRight">75dp</item> <item name="cornerFamilyBottomRight">cut</item>
-        <item name="cornerSizeBottomRight">75dp</item> <item name="cornerFamilyTopLeft">rounded</item>
-        <item name="cornerSizeTopLeft">0dp</item>
-        <item name="cornerFamilyBottomLeft">rounded</item>
-        <item name="cornerSizeBottomLeft">0dp</item>
-    </style>
-
-    <style name="BlackCheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox">
-        <item name="colorAccent">#000000</item> <item name="android:textColorSecondary">#000000</item>
     </style>
 
     <style name="TextAppearance.Fractal.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall">
@@ -83,8 +59,24 @@
         <item name="android:fontFamily">@font/genos_family</item>
     </style>
 
-    <!-- Custom button style with Genos -->
+    <style name="SidebarCutShape" parent="">
+        <item name="cornerFamilyTopRight">cut</item>
+        <item name="cornerSizeTopRight">75dp</item>
+        <item name="cornerFamilyBottomRight">cut</item>
+        <item name="cornerSizeBottomRight">75dp</item>
+        <item name="cornerFamilyTopLeft">rounded</item>
+        <item name="cornerSizeTopLeft">0dp</item>
+        <item name="cornerFamilyBottomLeft">rounded</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+    <style name="BlackCheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="colorAccent">#000000</item>
+        <item name="android:textColorSecondary">#000000</item>
+    </style>
+
     <style name="Fractal.Button" parent="Widget.Material3.Button">
         <item name="android:fontFamily">@font/genos_family</item>
     </style>
+
 </resources>

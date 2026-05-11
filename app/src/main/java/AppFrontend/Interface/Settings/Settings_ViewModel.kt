@@ -1,10 +1,12 @@
 package AppFrontend.Interface.Settings
 
 import android.app.Application
+import android.content.Intent
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
-import AppGlobal.GlobalState
 import AppGlobal.Utils.FileOperations
 import com.example.fractal.FractalApplication
+import com.example.fractal.OvernightManagerService
 
 class Settings_ViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -20,19 +22,13 @@ class Settings_ViewModel(application: Application) : AndroidViewModel(applicatio
         fileOps.writeJson("app_config.json", globalState.appConfig)
     }
 
-    fun updateSettings(){
-
-    }
-
     // --- Actions ---
 
     fun toggleWifi() {
         val config = getConfig()
         if (config.onWifi) {
             // Trying to turn Wifi OFF. Only allow if Data is ON.
-            if (config.onData) {
-                config.onWifi = false
-            }
+            if (config.onData) config.onWifi = false
         } else {
             // Turning Wifi ON is always allowed.
             config.onWifi = true
@@ -44,9 +40,7 @@ class Settings_ViewModel(application: Application) : AndroidViewModel(applicatio
         val config = getConfig()
         if (config.onData) {
             // Trying to turn Data OFF. Only allow if Wifi is ON.
-            if (config.onWifi) {
-                config.onData = false
-            }
+            if (config.onWifi) config.onData = false
         } else {
             // Turning Data ON is always allowed.
             config.onData = true
@@ -58,6 +52,16 @@ class Settings_ViewModel(application: Application) : AndroidViewModel(applicatio
         val config = getConfig()
         config.overNightUtilization = !config.overNightUtilization
         saveConfig()
+
+        // ── LIVE SERVICE CONTROL ──
+        // Instantly starts or stops the Supervisor when the user taps the toggle
+        val serviceIntent = Intent(app, OvernightManagerService::class.java)
+
+        if (config.overNightUtilization) {
+            ContextCompat.startForegroundService(app, serviceIntent)
+        } else {
+            app.stopService(serviceIntent)
+        }
     }
 
     fun toggleIdle() {
@@ -72,7 +76,6 @@ class Settings_ViewModel(application: Application) : AndroidViewModel(applicatio
         saveConfig()
     }
 
-    // Update the charge limit percentage
     fun updateChargeLimit(value: Int) {
         val config = getConfig()
         config.minChargeLimit = value

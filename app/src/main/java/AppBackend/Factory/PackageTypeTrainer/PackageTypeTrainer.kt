@@ -89,6 +89,11 @@ class PackageTypeTrainer(
                     // Success! Flush and exit loop cleanly.
                     callback?.onStatusUpdate("Flushing Temporary Storage...")
                     flusher.flushAll(task)
+
+                    // --- NEW: Tell the HomeViewModel to turn Vapor into Liquid! ---
+                    callback?.onUploadSuccess()
+                    // --------------------------------------------------------------
+
                     callback?.onStatusUpdate("Process Complete")
                     break
                 } else {

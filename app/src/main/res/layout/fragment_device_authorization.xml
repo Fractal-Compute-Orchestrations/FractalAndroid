@@ -49,7 +49,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="80dp">
+            android:layout_marginTop="40dp">
 
             <EditText
                 android:id="@+id/et_username"
@@ -65,6 +65,50 @@
                 android:textColor="#000000"
                 android:textColorHint="#50000000"
                 android:textSize="16dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <EditText
+                    android:id="@+id/et_phone"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1.2"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/input_border"
+                    android:fontFamily="@font/genos_regular"
+                    android:hint="Phone (+92...)"
+                    android:inputType="phone"
+                    android:letterSpacing="0.16"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:singleLine="true"
+                    android:textColor="#000000"
+                    android:textColorHint="#50000000"
+                    android:textSize="16dp" />
+
+                <EditText
+                    android:id="@+id/et_carrier"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="0.8"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/input_border"
+                    android:fontFamily="@font/genos_regular"
+                    android:hint="Carrier"
+                    android:inputType="text"
+                    android:letterSpacing="0.16"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:singleLine="true"
+                    android:textColor="#000000"
+                    android:textColorHint="#50000000"
+                    android:textSize="16dp" />
+            </LinearLayout>
 
             <EditText
                 android:id="@+id/et_email"
@@ -143,16 +187,11 @@
                     android:layout_height="wrap_content"
                     android:button="@drawable/checkbox_selector"
                     android:paddingStart="8dp"
-                    android:layout_marginRight="10dp"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:minWidth="48dp"
+                    android:minHeight="48dp"
+                    android:text="I Agree To "
                     android:fontFamily="@font/genos_regular"
                     android:letterSpacing="0.16"
-                    android:text="I Agree To "
                     android:textColor="#000000"
                     android:textSize="16dp" />
 
@@ -160,6 +199,8 @@
                     android:id="@+id/tv_terms_link"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
                     android:fontFamily="@font/genos_regular"
                     android:letterSpacing="0.16"
                     android:text="Terms And Conditions"

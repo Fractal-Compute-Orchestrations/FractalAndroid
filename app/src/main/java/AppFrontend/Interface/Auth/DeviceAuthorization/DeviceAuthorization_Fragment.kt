@@ -132,10 +132,12 @@ class DeviceAuthorization_Fragment : Fragment() {
     fun button_LoginRegister() {
         val username = binding.etUsername.text.toString().trim()
         val email = binding.etEmail.text.toString().trim()
+        val phone = binding.etPhone.text.toString().trim()     // <-- NEW
+        val carrier = binding.etCarrier.text.toString().trim() // <-- NEW
         val password = binding.etPassword.text.toString().trim()
         val agreedToTerms = binding.cbTerms.isChecked
 
-        if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+        if (username.isEmpty() || email.isEmpty() || phone.isEmpty() || carrier.isEmpty() || password.isEmpty()) {
             Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
             return
         }
@@ -145,7 +147,8 @@ class DeviceAuthorization_Fragment : Fragment() {
             return
         }
 
-        val loginData = LoginRegister_DTO(username, password, email)
+        // Pass the new fields into the DTO
+        val loginData = LoginRegister_DTO(username, password, email, phone, carrier)
         viewModel.loginRegister(loginData)
     }
 

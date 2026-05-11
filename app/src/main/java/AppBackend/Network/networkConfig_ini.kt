@@ -5,7 +5,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 class networkConfig_ini {
     var API_KEY: String = ""
 
-//    var SERVER_IP: String = "10.120.148.60"
+//    var SERVER_IP: String = "192.168.0.103"
 //    var SERVER_PORT: String = "5000"
 //    var SERVER_PROTOCOL: String = "http"
 

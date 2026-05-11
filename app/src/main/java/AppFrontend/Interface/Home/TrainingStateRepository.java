@@ -1,31 +1,3 @@
-//package AppFrontend.Interface.Home;
-//
-//import androidx.lifecycle.MutableLiveData;
-//import AppBackend.ResourceManagement.ResourceManager.ResourceStatistics;
-//
-//public class TrainingStateRepository {
-//    private static TrainingStateRepository instance;
-//
-//    // These survive even when the UI is completely destroyed
-//    public final MutableLiveData<Integer> trainingProgress = new MutableLiveData<>(0);
-//    public final MutableLiveData<String> statusMessage = new MutableLiveData<>("inactive");
-//    public final MutableLiveData<ResourceStatistics> detailedStats = new MutableLiveData<>(
-//            new ResourceStatistics("0%", "Calculating...", "0 / 0", "Pending")
-//    );
-//
-//    // Safety flag to strictly prevent multiple threads
-//    public boolean isTrainingActive = false;
-//
-//    private TrainingStateRepository() {}
-//
-//    public static synchronized TrainingStateRepository getInstance() {
-//        if (instance == null) {
-//            instance = new TrainingStateRepository();
-//        }
-//        return instance;
-//    }
-//}
-
 package AppFrontend.Interface.Home;
 
 import androidx.lifecycle.MutableLiveData;

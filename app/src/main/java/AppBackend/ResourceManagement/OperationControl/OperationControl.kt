@@ -94,15 +94,6 @@ class OperationControl(private val context: Context) {
     private fun evaluateDeviceState(): Pair<Boolean, String> {
         val config = globalState.appConfig ?: AppGlobal.app_config()
 
-        // --- CASE 5: Over-night Utilization (12 AM to 8 AM) ---
-        if (config.overNightUtilization) {
-            val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-            // HOUR_OF_DAY is 24-hour format. 0 is 12AM, 7 is 7:59AM.
-            if (currentHour < 0 || currentHour >= 8) {
-                return Pair(false, "Standby: Waiting for over-night hours (12AM - 8AM)")
-            }
-        }
-
         // --- CASE 6: Idle-Time Utilization (Screen is OFF) ---
         if (config.idleTimeUtilization) {
             val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
@@ -113,6 +104,7 @@ class OperationControl(private val context: Context) {
 
         // --- Get Battery Info ---
         val batteryStatus = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        if (batteryStatus == null) return Pair(true, "Optimal conditions met.") // Default to true if battery check fails
         val status = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
         val isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
 

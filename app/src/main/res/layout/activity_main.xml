@@ -31,7 +31,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/custom_header"
-            app:navGraph="@navigation/mobile_navigation" />
+             />
 
         <ImageView
             android:id="@+id/imageView"
