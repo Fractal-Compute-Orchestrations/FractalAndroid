@@ -10,7 +10,7 @@
 [![Android API](https://img.shields.io/badge/API-24%2B-073042.svg?logo=android)](https://developer.android.com/studio)
 [![Architecture](https://img.shields.io/badge/Architecture-MVVM-FF6F00.svg)](#)
 [![License](https://img.shields.io/badge/License-MIT-4CAF50.svg)](LICENSE)
-[![Build Status](https://github.com/AhmadHassan-BTed/Fractal/actions/workflows/android.yml/badge.svg)](https://github.com/AhmadHassan-BTed/Fractal/actions/workflows/android.yml)
+[![Build Status](https://github.com/Fractal-Compute-Orchestrations/FractalAndroid/actions/workflows/android.yml/badge.svg)](https://github.com/Fractal-Compute-Orchestrations/FractalAndroid/actions/workflows/android.yml)
 
 ---
 
@@ -178,7 +178,7 @@ Fractal-Application/
 ### Build Workflow
 ```bash
 # 1. Clone the project
-git clone https://github.com/AhmadHassan-BTed/Fractal.git
+git clone https://github.com/Fractal-Compute-Orchestrations/FractalAndroid.git
 
 # 2. Sync Gradle dependencies
 ./gradlew build
@@ -199,8 +199,8 @@ Fractal utilizes GitHub Actions to ensure code quality:
 
 New contributors are welcomed to the Fractal ecosystem. Please review the [Contributing Guidelines](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) to maintain a collaborative and respectful environment.
 
-- **Found a bug?** Open an [issue](https://github.com/AhmadHassan-BTed/Fractal/issues).
-- **Have a feature idea?** Submit a [feature request](https://github.com/AhmadHassan-BTed/Fractal/issues).
+- **Found a bug?** Open an [issue](https://github.com/Fractal-Compute-Orchestrations/FractalAndroid/issues).
+- **Have a feature idea?** Submit a [feature request](https://github.com/Fractal-Compute-Orchestrations/FractalAndroid/issues).
 - **Security**: Please refer to the [Security Policy](SECURITY.md) for vulnerability disclosure.
 
 ---
