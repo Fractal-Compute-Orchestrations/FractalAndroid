@@ -62,3 +62,6 @@ Thumbs.db
 app/release/
 *.aab
 *.apk
+
+# Private Staging
+.private_backup/
