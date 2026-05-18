@@ -10,7 +10,7 @@ class networkConfig_ini {
 //    var SERVER_PROTOCOL: String = "http"
 
     val SERVER_IP: String
-        get() = FirebaseRemoteConfig.getInstance().getString("server_ip").takeIf { it.isNotEmpty() } ?: "fractal-grid.duckdns.org"
+        get() = FirebaseRemoteConfig.getInstance().getString("server_ip").takeIf { it.isNotEmpty() } ?: "api.fractalgrid.dpdns.org"
     val SERVER_PROTOCOL: String
         get() = FirebaseRemoteConfig.getInstance().getString("server_protocol").takeIf { it.isNotEmpty() } ?: "https"
     val SERVER_PORT: String

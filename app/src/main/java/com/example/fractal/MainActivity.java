@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
         Map<String, Object> defaults = new HashMap<>();
         defaults.put("server_protocol", "https");
-        defaults.put("server_ip", "fractal-grid.duckdns.org");
+        defaults.put("server_ip", "api.fractalgrid.dpdns.org");
         defaults.put("server_port", "");
 
         mFirebaseRemoteConfig.setDefaultsAsync(defaults);
