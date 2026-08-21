@@ -1,6 +1,6 @@
 <div align="center">
 
-![Fractal App Icon](docs/assets/logo.png)
+![FractalAndroid Header](docs/assets/header_14.png)
 
 # FractalAndroid
 ### Resource-Aware Edge Compute Node and Mobile Execution Engine
@@ -14,7 +14,7 @@
 
 **FractalAndroid is the distributed compute client and edge execution runtime for the Fractal decentralized intelligence framework.**
 
-[Overview](#overview) | [Design Case Study](https://www.behance.net/gallery/221459335/Fractal) | [Architecture](#system-architecture) | [Telemetry Gating](#hardware-telemetry-gating) | [Execution Lifecycle](#execution-lifecycle) | [Module Map](#module-breakdown) | [Build & Setup](#development-and-build)
+[Overview](#overview) | [Hardware Architecture](#device-hardware-architecture--form-factors) | [App UI Tour](#mobile-application-interface) | [WiFi Bank Rewards](#wifi-bank--bandwidth-rewards) | [Design Case Study](https://www.behance.net/gallery/221459335/Fractal) | [Architecture](#system-architecture) | [Telemetry Gating](#hardware-telemetry-gating) | [Lifecycle](#execution-lifecycle) | [Build & Setup](#development-and-build)
 
 ---
 </div>
@@ -24,6 +24,102 @@
 FractalAndroid turns Android mobile devices into autonomous, privacy-preserving compute nodes within the Fractal distributed network. Operating in coordination with the central server (**FractalCore**), the application executes localized machine learning workloads—including on-device federated training (TFLite) and partitioned foundation model inference (ExecuTorch)—without exposing user data or degrading host device performance.
 
 The client is designed with strict resource empathy: the engine continuously monitors physical hardware telemetry (SoC temperature, battery level, charging status, RAM pressure) and dynamically gates computation to guarantee zero impact on user experience or battery longevity.
+
+---
+
+## Device Hardware Architecture & Form Factors
+
+<table>
+  <tr>
+    <td width="25%" align="center"><img src="docs/assets/hardware_grid/15.png" width="100%" alt="Hardware Architecture 1"></td>
+    <td width="25%" align="center"><img src="docs/assets/hardware_grid/16.png" width="100%" alt="Hardware Architecture 2"></td>
+    <td width="25%" align="center"><img src="docs/assets/hardware_grid/17.png" width="100%" alt="Hardware Architecture 3"></td>
+    <td width="25%" align="center"><img src="docs/assets/hardware_grid/18.png" width="100%" alt="Hardware Architecture 4"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Hardware Gating</b><br>Autonomous thermal & battery control</sub></td>
+    <td align="center"><sub><b>Zero-Copy MMap</b><br>Direct virtual memory mapped execution</sub></td>
+    <td align="center"><sub><b>SoC Optimization</b><br>Mobile GPU/NPU kernel acceleration</sub></td>
+    <td align="center"><sub><b>Edge Topology</b><br>Decentralized mesh node distribution</sub></td>
+  </tr>
+</table>
+
+---
+
+## Mobile Application Interface
+
+### 1. Onboarding, Device Authorization & Binding
+<table>
+  <tr>
+    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Get started.png" width="100%" alt="Get Started"></td>
+    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Device Authorization.png" width="100%" alt="Device Authorization"></td>
+    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Registered Info.png" width="100%" alt="Registered Node Info"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Welcome & Onboarding:</b> Seamless introductory node setup.</sub></td>
+    <td align="center"><sub><b>Device Authorization:</b> Cryptographic device registration.</sub></td>
+    <td align="center"><sub><b>Registered Info:</b> Node specifications and assigned cluster.</sub></td>
+  </tr>
+</table>
+
+### 2. Fleet Execution & Operational States
+<table>
+  <tr>
+    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Home_active.png" width="100%" alt="Home Active"></td>
+    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Home_Inactive.png" width="100%" alt="Home Inactive"></td>
+    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Settings.png" width="100%" alt="Node Settings"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Active Compute State:</b> Live training round, gradient computation, and token earnings.</sub></td>
+    <td align="center"><sub><b>Standby State:</b> Safe power preservation while awaiting cluster dispatch.</sub></td>
+    <td align="center"><sub><b>Node Settings:</b> Configurable telemetry thresholds and network policies.</sub></td>
+  </tr>
+</table>
+
+### 3. Performance Telemetry & Hardware Insights
+<table>
+  <tr>
+    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Usage Insights.png" width="100%" alt="Usage Insights"></td>
+    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Device Insights.png" width="100%" alt="Device Insights"></td>
+    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Model Training.png" width="100%" alt="Model Training Insights"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Usage Insights:</b> Cumulative compute contribution and bandwidth quotas.</sub></td>
+    <td align="center"><sub><b>Device Insights:</b> Real-time thermal graphs, battery curves, and RAM utilization.</sub></td>
+    <td align="center"><sub><b>Model Training:</b> Live loss trajectory and batch completion analytics.</sub></td>
+  </tr>
+</table>
+
+---
+
+## WiFi Bank & Bandwidth Rewards
+
+Fractal transforms idle consumer mobile hardware into active decentralized compute infrastructure through a fair, transparent reward exchange:
+
+- **Edge Compute Contribution**: When connected to power and unmetered Wi-Fi, the Android node executes quantized gradient descent or model slice inference.
+- **Liquid Bandwidth Credits (WiFi Bank)**: Every validated parameter checkpoint (`.ckpt`) uploaded to FractalCore automatically credits liquid MBs to the device's account via the Firestore ledger.
+- **Bandwidth Redemption**: Users can redeem their accumulated data credits directly for high-speed Wi-Fi access or shared bandwidth pools.
+
+<table>
+  <tr>
+    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training.png" width="100%" alt="WiFi Bank Step 1"></td>
+    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-1.png" width="100%" alt="WiFi Bank Step 2"></td>
+    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-2.png" width="100%" alt="WiFi Bank Step 3"></td>
+    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-3.png" width="100%" alt="WiFi Bank Step 4"></td>
+    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-4.png" width="100%" alt="WiFi Bank Step 5"></td>
+    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-5.png" width="100%" alt="WiFi Bank Step 6"></td>
+    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-6.png" width="100%" alt="WiFi Bank Step 7"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Session Init</b></sub></td>
+    <td align="center"><sub><b>Task Fetch</b></sub></td>
+    <td align="center"><sub><b>Data Stream</b></sub></td>
+    <td align="center"><sub><b>Local Compute</b></sub></td>
+    <td align="center"><sub><b>Reward Credit</b></sub></td>
+    <td align="center"><sub><b>Ledger Update</b></sub></td>
+    <td align="center"><sub><b>WiFi Bank Balance</b></sub></td>
+  </tr>
+</table>
 
 ---
 
