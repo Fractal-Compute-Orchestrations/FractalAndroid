@@ -65,14 +65,14 @@ The client is designed with strict resource empathy: the engine continuously mon
 ### 2. Node Fleet States & Real-Time Compute
 <table>
   <tr>
-    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Home_inactive.png" width="100%" alt="Home Inactive"></td>
+    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Home_Inactive.png" width="100%" alt="Home Inactive"></td>
     <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Home_active.png" width="100%" alt="Home Active"></td>
-    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - HeartBeat.png" width="100%" alt="Heartbeat Activity"></td>
+    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Settings.png" width="100%" alt="Node Settings"></td>
   </tr>
   <tr>
     <td align="center"><sub><b>Home (Standby / Inactive):</b> Idle state awaiting task assignment with live hardware monitors.</sub></td>
     <td align="center"><sub><b>Home (Active Compute):</b> Active local training with pulsing fractal diamond indicator.</sub></td>
-    <td align="center"><sub><b>Heartbeat Monitor:</b> Real-time ping pulses syncing node availability with FractalCore.</sub></td>
+    <td align="center"><sub><b>Node Settings & Preferences:</b> Autonomous telemetry thresholds and charging policies.</sub></td>
   </tr>
 </table>
 
