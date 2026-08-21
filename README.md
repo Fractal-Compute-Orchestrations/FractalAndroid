@@ -5,12 +5,12 @@
 # FractalAndroid
 ### Resource-Aware Edge Compute Node and Mobile Execution Engine
 
-[![Kotlin Version](https://img.shields.io/badge/Kotlin-1.9.0%2B-0095D5.svg?logo=kotlin&style=flat-square)](https://kotlinlang.org)
-[![Android API](https://img.shields.io/badge/API-24%2B-073042.svg?logo=android&style=flat-square)](https://developer.android.com/studio)
-[![Design](https://img.shields.io/badge/Design_Case_Study-Behance-0057ff.svg?logo=behance&style=flat-square)](https://www.behance.net/gallery/221459335/Fractal)
-[![Architecture](https://img.shields.io/badge/Architecture-MVVM-FF6F00.svg?style=flat-square)](#)
-[![License](https://img.shields.io/badge/License-MIT-4CAF50.svg?style=flat-square)](LICENSE)
-[![Build Status](https://github.com/Fractal-Compute-Orchestrations/FractalAndroid/actions/workflows/android.yml/badge.svg)](https://github.com/Fractal-Compute-Orchestrations/FractalAndroid/actions/workflows/android.yml)
+[![Kotlin Version](https://img.shields.io/badge/Kotlin-1.9.0%2B-black?style=for-the-badge&logo=kotlin)](https://kotlinlang.org)
+[![Android API](https://img.shields.io/badge/API-24%2B-black?style=for-the-badge&logo=android)](https://developer.android.com/studio)
+[![Design](https://img.shields.io/badge/Design_Case_Study-Behance-black?style=for-the-badge&logo=behance)](https://www.behance.net/gallery/221459335/Fractal)
+[![Architecture](https://img.shields.io/badge/Architecture-MVVM-black?style=for-the-badge)](#)
+[![License](https://img.shields.io/badge/License-MIT-black?style=for-the-badge)](LICENSE)
+[![Build Status](https://img.shields.io/badge/Build-Passing-black?style=for-the-badge)](https://github.com/Fractal-Compute-Orchestrations/FractalAndroid/actions/workflows/android.yml)
 
 **FractalAndroid is the distributed compute client and edge execution runtime for the Fractal decentralized intelligence framework.**
 
