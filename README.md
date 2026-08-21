@@ -1,6 +1,6 @@
 <div align="center">
 
-![FractalAndroid Header](docs/assets/header_14.png)
+![FractalAndroid Header](docs/assets/header_13.png)
 
 # FractalAndroid
 ### Resource-Aware Edge Compute Node and Mobile Execution Engine
@@ -14,7 +14,7 @@
 
 **FractalAndroid is the distributed compute client and edge execution runtime for the Fractal decentralized intelligence framework.**
 
-[Overview](#overview) | [Hardware Architecture](#device-hardware-architecture--form-factors) | [App UI Tour](#mobile-application-interface) | [WiFi Bank Rewards](#wifi-bank--bandwidth-rewards) | [Design Case Study](https://www.behance.net/gallery/221459335/Fractal) | [Architecture](#system-architecture) | [Telemetry Gating](#hardware-telemetry-gating) | [Lifecycle](#execution-lifecycle) | [Build & Setup](#development-and-build)
+[Overview](#overview) | [Design Showcase](#mobile-ui-design--hardware-showcase) | [App UI Tour](#mobile-application-interface) | [WiFi Bank Rewards](#wifi-bank--bandwidth-rewards) | [Design Case Study](https://www.behance.net/gallery/221459335/Fractal) | [Architecture](#system-architecture) | [Telemetry Gating](#hardware-telemetry-gating) | [Lifecycle](#execution-lifecycle) | [Build & Setup](#development-and-build)
 
 ---
 </div>
@@ -32,15 +32,15 @@ The client is designed with strict resource empathy: the engine continuously mon
 <table>
   <tr>
     <td width="25%" align="center"><img src="docs/assets/hardware_grid/15.png" width="100%" alt="Active Node Telemetry"></td>
+    <td width="25%" align="center"><img src="docs/assets/hardware_grid/14.png" width="100%" alt="Model Training Metrics"></td>
     <td width="25%" align="center"><img src="docs/assets/hardware_grid/16.png" width="100%" alt="Platform Architecture"></td>
     <td width="25%" align="center"><img src="docs/assets/hardware_grid/17.png" width="100%" alt="Dock Iconography"></td>
-    <td width="25%" align="center"><img src="docs/assets/hardware_grid/18.png" width="100%" alt="OS Home Integration"></td>
   </tr>
   <tr>
     <td align="center"><sub><b>Active Compute Node</b><br>Live training telemetry & diamond meter</sub></td>
+    <td align="center"><sub><b>Model Training Metrics</b><br>Performance curves & parameter transfer</sub></td>
     <td align="center"><sub><b>Platform Architecture</b><br>Decentralized cloud & studio identity</sub></td>
     <td align="center"><sub><b>Dock Iconography</b><br>Light & dark adaptive icon variants</sub></td>
-    <td align="center"><sub><b>OS Home Integration</b><br>Seamless launcher app integration</sub></td>
   </tr>
 </table>
 
