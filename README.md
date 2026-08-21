@@ -2,221 +2,222 @@
 
 ![Fractal App Icon](docs/assets/logo.png)
 
-# Fractal
+# FractalAndroid
+### Resource-Aware Edge Compute Node and Mobile Execution Engine
 
-**A Human-Centric, Resource-Aware Edge Computing & Federated Learning Node for Android**
-
-[![Kotlin Version](https://img.shields.io/badge/Kotlin-1.9.0%2B-0095D5.svg?logo=kotlin)](https://kotlinlang.org)
-[![Android API](https://img.shields.io/badge/API-24%2B-073042.svg?logo=android)](https://developer.android.com/studio)
-[![Architecture](https://img.shields.io/badge/Architecture-MVVM-FF6F00.svg)](#)
-[![License](https://img.shields.io/badge/License-MIT-4CAF50.svg)](LICENSE)
+[![Kotlin Version](https://img.shields.io/badge/Kotlin-1.9.0%2B-0095D5.svg?logo=kotlin&style=flat-square)](https://kotlinlang.org)
+[![Android API](https://img.shields.io/badge/API-24%2B-073042.svg?logo=android&style=flat-square)](https://developer.android.com/studio)
+[![Architecture](https://img.shields.io/badge/Architecture-MVVM-FF6F00.svg?style=flat-square)](#)
+[![License](https://img.shields.io/badge/License-MIT-4CAF50.svg?style=flat-square)](LICENSE)
 [![Build Status](https://github.com/Fractal-Compute-Orchestrations/FractalAndroid/actions/workflows/android.yml/badge.svg)](https://github.com/Fractal-Compute-Orchestrations/FractalAndroid/actions/workflows/android.yml)
 
+**FractalAndroid is the distributed compute client and edge execution runtime for the Fractal decentralized intelligence framework.**
+
+[Overview](#overview) | [Architecture](#system-architecture) | [Telemetry Gating](#hardware-telemetry-gating) | [Execution Lifecycle](#execution-lifecycle) | [Module Map](#module-breakdown) | [Build & Setup](#development-and-build)
+
 ---
-
-**Empowering devices, preserving privacy, and bridging the gap between machine intelligence and human experience.**
-
-[Philosophy](#philosophy) • [Architecture](#architecture-overview) • [System Flow](#system-workflow) • [Onboarding](#getting-started) • [Contributing](#contributing)
-
 </div>
-
----
 
 ## Overview
 
-**Fractal** is an advanced Android client designed to transform mobile devices into autonomous compute nodes within a distributed federated network. By localizing compute-heavy machine learning tasks, Fractal ensures that sensitive data remains exactly where it belongs: with the user.
+FractalAndroid turns Android mobile devices into autonomous, privacy-preserving compute nodes within the Fractal distributed network. Operating in coordination with the central server (**FractalCore**), the application executes localized machine learning workloads—including on-device federated training (TFLite) and partitioned foundation model inference (ExecuTorch)—without exposing user data or degrading host device performance.
 
-In an era of centralized AI, Fractal represents a shift toward **Empathetic Engineering**. The system is built to respect the host device’s primary purpose—serving the human user. Through rigorous hardware telemetry gating, background operations are dynamically managed to ensure zero impact on device performance, thermal comfort, or battery longevity.
-
----
-
-## Philosophy
-
-### Human-Centric Edge Computing
-The "Fractal" name reflects the project's vision: small, self-similar units of intelligence that, when combined, create a complex and powerful whole. 
-*   **Privacy by Default**: Data never leaves the device. Only mathematical insights (weights) are shared.
-*   **Resource Empathy**: The software "feels" the device's strain. If the phone gets warm or the battery drops, Fractal steps back.
-*   **Democratic AI**: Decentralizing compute power gives individuals control over the future of distributed intelligence.
+The client is designed with strict resource empathy: the engine continuously monitors physical hardware telemetry (SoC temperature, battery level, charging status, RAM pressure) and dynamically gates computation to guarantee zero impact on user experience or battery longevity.
 
 ---
 
-## Architecture Overview
+## System Architecture
 
-Fractal is engineered with a strict decoupling of telemetry monitoring, execution engines, and presentation layers. This ensures stability and modularity at scale.
-
-> [!TIP]
-> For a comprehensive, low-level technical breakdown of the system's internal wiring, the [Master Architecture Diagram](docs/diagrams/architecture.drawio) is available. This file can be viewed or edited using [app.diagrams.net](https://app.diagrams.net/).
+The client application follows a decoupled Model-View-ViewModel (MVVM) architecture with strict separation between UI telemetry rendering, hardware gating controllers, execution runtimes, and network synchronization layers.
 
 ```mermaid
 graph TD
-    subgraph Cloud [Aggregation Server]
-        MA[Model Aggregator]
-        TD[Task Distributor]
+    subgraph CentralServer ["FractalCore Control Plane"]
+        TaskDistributor["Task & Segment Dispatcher"]
+        ModelAggregator["Federated Model Aggregator"]
     end
 
-    subgraph FractalNode [Fractal Android Node]
+    subgraph FractalAndroidClient ["FractalAndroid Compute Node"]
         direction TB
-        subgraph Frontend [Presentation Layer]
-            UI[Insights & Auth UI]
-            VM[Telemetry ViewModels]
+
+        subgraph PresentationLayer ["Presentation Layer (MVVM)"]
+            UI["Dashboard, Insights & Telemetry UI"]
+            VM["Telemetry & Task ViewModels"]
         end
 
-        subgraph Core [Execution Layer]
-            RM[Resource Manager]
-            LTE[Local Training Engine]
-            VAL[Inference Validator]
+        subgraph GatingLayer ["Hardware Governance"]
+            OperationControl["OperationControl (Thermal & SoC Gating)"]
+            TelemetrySensors["Battery, Thermal & Network Monitors"]
         end
 
-        subgraph Data [Data Layer]
-            DAO[Server DAO]
-            CM[Checkpoint Manager]
-            Net[TLS Transmitter]
+        subgraph ExecutionLayer ["Compute Execution Engine"]
+            ImageTrainer["Image_Trainer (TFLite Engine)"]
+            MMapLoader["Zero-Copy MMap Loader (PTE Slices)"]
+            CheckpointMgr["CheckpointManager (.ckpt Serialization)"]
+        end
+
+        subgraph NetworkLayer ["Data & Transport Tier"]
+            ServerDAO["Server_DAO (Task Poller)"]
+            Transmitter["ModelTransmitter (TLS Weight Egress)"]
         end
     end
 
-    TD -- "Encrypted Params" --> DAO
-    DAO -- "Validates" --> VAL
-    VAL -- "Initialized" --> LTE
-    RM -- "Gating Signals" --> LTE
-    LTE -- "Checkpoints" --> CM
-    CM -- "Parameter Deltas" --> Net
-    Net -- "Weight Updates" --> MA
-    RM -- "Live Stats" --> VM
-    VM -- "Update" --> UI
+    %% Wiring
+    TaskDistributor <-->|"REST HTTPS (/api/task/current)"| ServerDAO
+    ServerDAO --> OperationControl
+    OperationControl --> TelemetrySensors
+    TelemetrySensors --> VM
+    VM --> UI
+
+    OperationControl -->|"Permit: GRANTED"| ImageTrainer
+    OperationControl -->|"Permit: GRANTED"| MMapLoader
+    ImageTrainer --> CheckpointMgr
+    CheckpointMgr --> Transmitter
+    Transmitter -->|"POST /api/model/upload"| ModelAggregator
 ```
 
 ---
 
-## System Workflow
+## Hardware Telemetry Gating
 
-### The Data Lifecycle
-The following flow illustrates how a single training task progresses from discovery to completion while maintaining hardware safety.
+The client enforces strict multi-variable gating via `OperationControl` before and during computation:
+
+```text
++------------------------+--------------------------+-------------------------------------+
+| Telemetry Parameter    | Operational Threshold    | Action on Violation                 |
++------------------------+--------------------------+-------------------------------------+
+| Battery State-of-Charge| Level >= 50% or Charging | Workload paused until connected     |
+| Battery Temperature    | Temp <= 40.0 C           | Execution paused until cooled       |
+| Network Connectivity   | Unmetered Wi-Fi          | Checkpoint upload deferred          |
+| Memory Pressure        | System Memory Low == False| Zero-copy mmap bypasses ART heap   |
++------------------------+--------------------------+-------------------------------------+
+```
+
+---
+
+## Execution Lifecycle
+
+The lifecycle of a single federated compute round on the mobile client proceeds through automated telemetry checks, training execution, and encrypted checkpoint transmission.
 
 ```mermaid
 sequenceDiagram
-    participant S as Aggregation Server
-    participant N as Network Layer
-    participant R as Resource Manager
-    participant E as Training Engine
-    participant C as Checkpoint Manager
+    participant Server as FractalCore Server
+    participant Net as Server_DAO / Transmitter
+    participant Gate as OperationControl
+    participant Engine as Image_Trainer
+    participant Storage as CheckpointManager
 
-    Note over N,E: Standby Mode (Polling)
-    N->>S: Fetch Task (id, params)
-    S-->>N: Task Payload Received
-    
-    rect rgb(240, 240, 240)
-        Note right of R: Hardware Telemetry Check
-        R->>E: Resource Permit (GRANTED)
+    Note over Net,Engine: Standby & Periodic Task Polling
+    Net->>Server: GET /api/task/current (device_id)
+    Server-->>Net: ActiveTask Payload (URLs + Hyperparams)
+
+    Net->>Gate: Request Execution Permit
+    Gate->>Gate: Sample Battery SoC, Thermals & Charging
+    alt Thermals > 40C or Battery < 50%
+        Gate-->>Net: Permit DENIED (Backoff & Sleep)
+    else Hardware Telemetry Healthy
+        Gate-->>Net: Permit GRANTED
     end
 
-    E->>E: Initialize Weights
-    loop Every Epoch
-        E->>E: Local Training
-        E->>C: Save Checkpoint (Delta)
-        R->>E: Telemetry Check (Temp/Battery)
-        alt Thermal Halt
-            R->>E: Resource Permit (REVOKED)
-            E->>E: Pause & Wait
+    Net->>Server: Download Model (.tflite) + Binary Data Bins
+    Net->>Engine: Initialize Weights & Segment Inputs
+
+    loop Epoch Loop
+        Engine->>Engine: Execute Local Gradient Descent Batch
+        Gate->>Gate: Continuous Thermal Check
+        alt Thermal Spike Detected
+            Gate->>Engine: Signal PAUSE (Preserve State)
+            Note over Engine: Wait for Thermal Normalization
+            Gate->>Engine: Signal RESUME
         end
     end
 
-    E->>N: Transmit Parameter Deltas
-    N->>S: TLS Encrypted Weight Sync
-    S-->>N: Task ACK (Completed)
+    Engine->>Storage: Serialize Local Weight Checkpoint (.ckpt)
+    Storage->>Net: Pass Parameter Deltas
+    Net->>Server: POST /api/model/upload (task_Id, device_id, .ckpt)
+    Server-->>Net: 200 OK (Liquid MB Reward Credited)
 ```
 
 ---
 
-## Internal Module Structure
-
-<details>
-<summary><b>View Detailed Repository Map</b></summary>
+## Module Breakdown
 
 ```text
-Fractal-Application/
-├── app/src/main/java/
-│   ├── AppBackend/
-│   │   ├── DataManager/          # Caching & DTO initialization
-│   │   ├── LocalTrainingModule/  # TFLite Training & Checkpointing
-│   │   ├── Network/              # Secure DAOs & Transmitters
-│   │   ├── ResourceManagement/   # Thermal & CPU Telemetry logic
-│   │   ├── TaskContainer/        # Payload parsing (Image_Task)
-│   │   └── Validator/            # Accuracy & Inference verification
-│   ├── AppFrontend/
-│   │   ├── Auth/                 # Secure Binding & Registration
-│   │   ├── Home/                 # Real-time Training Dashboard
-│   │   ├── Insights/             # Telemetry & Performance Charts
-│   │   └── Settings/             # Global Node Configuration
-│   └── AppGlobal/                # Cross-cutting Utilities & Configs
-├── docs/assets/                  # Project visuals & logos
-└── build.gradle.kts              # Modern Kotlin DSL Build Config
+FractalAndroid/
+|-- app/src/main/java/
+|   |-- AppBackend/
+|   |   |-- DataManager/             # Dataset binary segment parsing and caching
+|   |   |-- LocalTrainingModule/     # TFLite Gradient Descent, Image_Trainer
+|   |   |-- Network/                 # Server_DAO, ModelTransmitter (TLS HTTP)
+|   |   |-- ResourceManagement/      # OperationControl, Battery & Thermal Telemetry
+|   |   |-- TaskContainer/           # ActiveTask DTOs and JSON serialization
+|   |   `-- Validator/               # Accuracy validation & inference assertions
+|   |-- AppFrontend/
+|   |   |-- Auth/                    # Node Registration & Binding UI
+|   |   |-- Home/                    # Real-Time Compute & Training Dashboard
+|   |   |-- Insights/                # Real-Time Telemetry & Hardware Charts
+|   |   `-- Settings/                # Target Server URL & Threshold Configuration
+|   `-- AppGlobal/                   # Cross-cutting Constants & Utility Helpers
+|-- build.gradle.kts                 # Root Kotlin DSL Build Configuration
+|-- app/build.gradle.kts             # Application Module Build Configuration
+`-- docs/                            # Architecture Diagrams (.drawio) and Assets
 ```
 
-</details>
-
 ---
 
-## Technical Pipeline
+## Technical Pipeline Specifications
 
-| Pipeline Stage | Implementation | Key Responsibility |
+| Pipeline Stage | Java/Kotlin Implementation | Responsibility |
 | :--- | :--- | :--- |
-| **Ingress** | `Server_DAO` | Task polling with backoff and TLS payload decryption. |
-| **Gating** | `OperationControl` | Multi-variable telemetry analysis (Thermal, SoC, RAM). |
-| **Execution** | `Image_Trainer` | On-device gradient descent using optimized TFLite kernels. |
-| **Persistence** | `CheckpointManager` | Fault-tolerant serialization of intermediate training states. |
-| **Egress** | `ModelTransmitter` | Payload compression and encrypted delta synchronization. |
+| **Ingress** | `Server_DAO` | Polling task endpoints with exponential backoff and payload decoding. |
+| **Gating** | `OperationControl` | Real-time multi-variable telemetry gating (Thermal, Battery, RAM). |
+| **Execution** | `Image_Trainer` | On-device gradient calculation using optimized TFLite mobile kernels. |
+| **Memory Map** | `PteLoader` (ExecuTorch) | Zero-copy virtual memory mapping (`mmap`) of partitioned `.pte` slices. |
+| **Persistence** | `CheckpointManager` | Serialization of intermediate parameter matrices. |
+| **Egress** | `ModelTransmitter` | Encrypted transmission of `.ckpt` parameter updates to FractalCore. |
 
 ---
 
-## Development & Build Pipeline
+## Development and Build
 
 ### Prerequisites
-* **Environment**: Android Studio Jellyfish (2023.3.1+)
-* **SDK**: Min API 24 / Target API 34
-* **Physical Device**: Required for accurate telemetry feedback loops.
+- **Android Studio**: Version 2023.3.1 (Jellyfish) or newer
+- **Android SDK**: Compile SDK 34, Min SDK 24
+- **JDK**: Java 17 (recommended for Gradle 8+)
+- **Physical Device**: Required for physical thermal and hardware sensor feedback loops
 
 ### Build Workflow
+
 ```bash
-# 1. Clone the project
+# 1. Clone the repository
 git clone https://github.com/Fractal-Compute-Orchestrations/FractalAndroid.git
+cd FractalAndroid
 
-# 2. Sync Gradle dependencies
-./gradlew build
+# 2. Build Debug APK
+./gradlew assembleDebug
 
-# 3. Deploy to hardware
+# 3. Execute Unit Tests
+./gradlew test
+
+# 4. Install and Run on Connected Device
 ./gradlew installDebug
 ```
 
-### CI/CD Status
-Fractal utilizes GitHub Actions to ensure code quality:
-- **Build Verification**: Automatic compilation check on all PRs.
-- **Linting**: Kotlin style guide enforcement.
-- **Artifact Generation**: Debug builds archived for rapid testing.
+---
+
+## Security & Privacy Guarantee
+
+- **Zero Data Exfiltration**: Raw user data (images, local sensor feeds) remains confined to local storage. Only mathematical parameter checkpoints are sent to the server.
+- **Hardware Protection**: Strict thermal and battery limits prevent device stress or accelerated battery degradation.
+- **TLS Egress Encryption**: All communications with FractalCore occur over HTTPS/TLS.
 
 ---
 
-## Contributing
+## Governance
 
-New contributors are welcomed to the Fractal ecosystem. Please review the [Contributing Guidelines](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) to maintain a collaborative and respectful environment.
+FractalAndroid is an open-source project architected by **[Ahmad Hassan (B-Ted)](https://github.com/Fractal-Compute-Orchestrations)**.
 
-- **Found a bug?** Open an [issue](https://github.com/Fractal-Compute-Orchestrations/FractalAndroid/issues).
-- **Have a feature idea?** Submit a [feature request](https://github.com/Fractal-Compute-Orchestrations/FractalAndroid/issues).
-- **Security**: Please refer to the [Security Policy](SECURITY.md) for vulnerability disclosure.
-
----
-
-## Credits
-
-### Lead Architect
-**Ahmad Hassan (B-Ted)**
-*Primary architecture, core engine development, and system design.*
-
-### Community
-Fractal is maintained and improved by its growing community of contributors.
-
----
-
-<div align="center">
-<i>Driven by Privacy. Powered by the Edge. Built for Humans.</i><br>
-Licensed under [MIT](LICENSE).
-</div>
+- Contributing: See [CONTRIBUTING.md](CONTRIBUTING.md)
+- Code of Conduct: See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- Security Policy: See [SECURITY.md](SECURITY.md)
+- License: Open-source under the [MIT License](LICENSE)

@@ -2,29 +2,29 @@
 
 ## Supported Versions
 
-The following versions of Fractal are currently being supported with security updates:
+The following table summarizes the support status for FractalAndroid releases:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+| Version | Supported |
+| :--- | :--- |
+| 2.1.x | Yes |
+| < 2.0 | No |
+
+---
 
 ## Reporting a Vulnerability
 
-Security is a primary focus for Fractal. If a security vulnerability is identified, please report it according to the guidelines below.
+Security is a primary focus for FractalAndroid. If you identify a potential security vulnerability, please follow the coordinated disclosure process:
 
-**Please do not report security vulnerabilities through public GitHub issues.**
+1. **Do not report vulnerabilities through public GitHub Issues or discussions.**
+2. Send a confidential report to `security@fractalcompute.io` with full technical details.
+3. Include the following information in your report:
+   - Vulnerability classification (e.g. intent spoofing, unauthorized file access, memory disclosure).
+   - Full paths of affected source files and methods.
+   - Exact Android API level and test device hardware specifications.
+   - Step-by-step reproduction instructions and proof-of-concept exploit if available.
+   - Assessed impact on client device security or telemetry integrity.
 
-Instead, please report them via email to [INSERT EMAIL].
-
-Please include the following information in the report:
-
-- Type of issue (e.g., buffer overflow, SQL injection, cross-site scripting, etc.)
-- Full paths of source file(s) related to the manifestation of the issue
-- The location of the affected code (tag/branch/commit or direct URL)
-- Any special configuration required to reproduce the issue
-- Step-by-step instructions to reproduce the issue
-- Proof-of-concept or exploit code (if possible)
-- Impact of the issue, including how an attacker might exploit it
-
-Receipt of the report will be acknowledged within 48 hours, and a timeline for addressing the issue will be provided. Coordination on the disclosure of the vulnerability will follow.
+### Response Timeline
+- **Initial Acknowledgment**: Within 48 hours of receipt.
+- **Triage & Remediation**: Within 7 business days.
+- **Patch Release**: Coordinated upon regression testing.
