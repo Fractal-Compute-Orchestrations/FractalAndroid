@@ -27,20 +27,20 @@ The client is designed with strict resource empathy: the engine continuously mon
 
 ---
 
-## Device Hardware Architecture & Form Factors
+## Mobile UI Design & Hardware Showcase
 
 <table>
   <tr>
-    <td width="25%" align="center"><img src="docs/assets/hardware_grid/15.png" width="100%" alt="Hardware Architecture 1"></td>
-    <td width="25%" align="center"><img src="docs/assets/hardware_grid/16.png" width="100%" alt="Hardware Architecture 2"></td>
-    <td width="25%" align="center"><img src="docs/assets/hardware_grid/17.png" width="100%" alt="Hardware Architecture 3"></td>
-    <td width="25%" align="center"><img src="docs/assets/hardware_grid/18.png" width="100%" alt="Hardware Architecture 4"></td>
+    <td width="25%" align="center"><img src="docs/assets/hardware_grid/15.png" width="100%" alt="Active Node Telemetry"></td>
+    <td width="25%" align="center"><img src="docs/assets/hardware_grid/16.png" width="100%" alt="Platform Architecture"></td>
+    <td width="25%" align="center"><img src="docs/assets/hardware_grid/17.png" width="100%" alt="Dock Iconography"></td>
+    <td width="25%" align="center"><img src="docs/assets/hardware_grid/18.png" width="100%" alt="OS Home Integration"></td>
   </tr>
   <tr>
-    <td align="center"><sub><b>Hardware Gating</b><br>Autonomous thermal & battery control</sub></td>
-    <td align="center"><sub><b>Zero-Copy MMap</b><br>Direct virtual memory mapped execution</sub></td>
-    <td align="center"><sub><b>SoC Optimization</b><br>Mobile GPU/NPU kernel acceleration</sub></td>
-    <td align="center"><sub><b>Edge Topology</b><br>Decentralized mesh node distribution</sub></td>
+    <td align="center"><sub><b>Active Compute Node</b><br>Live training telemetry & diamond meter</sub></td>
+    <td align="center"><sub><b>Platform Architecture</b><br>Decentralized cloud & studio identity</sub></td>
+    <td align="center"><sub><b>Dock Iconography</b><br>Light & dark adaptive icon variants</sub></td>
+    <td align="center"><sub><b>OS Home Integration</b><br>Seamless launcher app integration</sub></td>
   </tr>
 </table>
 
