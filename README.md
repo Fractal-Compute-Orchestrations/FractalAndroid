@@ -56,9 +56,9 @@ The client is designed with strict resource empathy: the engine continuously mon
     <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Registered Info.png" width="100%" alt="Registered Node Info"></td>
   </tr>
   <tr>
-    <td align="center"><sub><b>Welcome & Onboarding:</b> Seamless introductory node setup.</sub></td>
-    <td align="center"><sub><b>Device Authorization:</b> Cryptographic device registration.</sub></td>
-    <td align="center"><sub><b>Registered Info:</b> Node specifications and assigned cluster.</sub></td>
+    <td align="center"><sub><b>Welcome & Onboarding:</b> Introductory node setup.</sub></td>
+    <td align="center"><sub><b>Device Authorization:</b> Firebase auth & hardware ID binding.</sub></td>
+    <td align="center"><sub><b>Registered Info:</b> Node specs, RAM/storage, and assigned cluster.</sub></td>
   </tr>
 </table>
 
