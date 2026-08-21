@@ -179,16 +179,12 @@ graph TD
 
 The client enforces strict multi-variable gating via `OperationControl` before and during computation:
 
-```text
-+------------------------+--------------------------+-------------------------------------+
-| Telemetry Parameter    | Operational Threshold    | Action on Violation                 |
-+------------------------+--------------------------+-------------------------------------+
-| Battery State-of-Charge| Level >= 50% or Charging | Workload paused until connected     |
-| Battery Temperature    | Temp <= 40.0 C           | Execution paused until cooled       |
-| Network Connectivity   | Unmetered Wi-Fi          | Checkpoint upload deferred          |
-| Memory Pressure        | System Memory Low == False| Zero-copy mmap bypasses ART heap   |
-+------------------------+--------------------------+-------------------------------------+
-```
+| Telemetry Parameter | Operational Threshold | Action on Violation |
+| :--- | :--- | :--- |
+| **Battery State-of-Charge** | Level $\ge$ 50% or Charging == True | Workload paused until charging connected |
+| **Battery Temperature** | Temp $\le$ 40.0 C | Execution paused until thermal normalization |
+| **Network Connectivity** | Unmetered Wi-Fi Connected | Checkpoint upload deferred |
+| **Memory Pressure** | System Memory Low == False | Zero-copy mmap bypasses ART heap |
 
 ---
 
