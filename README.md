@@ -102,22 +102,22 @@ Fractal transforms idle consumer mobile hardware into active decentralized compu
 
 <table>
   <tr>
-    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training.png" width="100%" alt="WiFi Bank Step 1"></td>
-    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-1.png" width="100%" alt="WiFi Bank Step 2"></td>
-    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-2.png" width="100%" alt="WiFi Bank Step 3"></td>
-    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-3.png" width="100%" alt="WiFi Bank Step 4"></td>
-    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-4.png" width="100%" alt="WiFi Bank Step 5"></td>
-    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-5.png" width="100%" alt="WiFi Bank Step 6"></td>
-    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-6.png" width="100%" alt="WiFi Bank Step 7"></td>
+    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training.png" width="100%" alt="Internet Bank 0 GB"></td>
+    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-1.png" width="100%" alt="Internet Bank 0.5 GB"></td>
+    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-2.png" width="100%" alt="Internet Bank 0.7 GB"></td>
+    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-3.png" width="100%" alt="Internet Bank 1.0 GB"></td>
+    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-4.png" width="100%" alt="Internet Bank 1.5 GB"></td>
+    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-5.png" width="100%" alt="Internet Bank 1.8 GB"></td>
+    <td width="14.2%" align="center"><img src="docs/assets/wifi_bank/WH - Model Training-6.png" width="100%" alt="Internet Bank 2.0 GB"></td>
   </tr>
   <tr>
-    <td align="center"><sub><b>Session Init</b></sub></td>
-    <td align="center"><sub><b>Task Fetch</b></sub></td>
-    <td align="center"><sub><b>Data Stream</b></sub></td>
-    <td align="center"><sub><b>Local Compute</b></sub></td>
-    <td align="center"><sub><b>Reward Credit</b></sub></td>
-    <td align="center"><sub><b>Ledger Update</b></sub></td>
-    <td align="center"><sub><b>WiFi Bank Balance</b></sub></td>
+    <td align="center"><sub><b>0.0 GB</b><br>Initial / Empty</sub></td>
+    <td align="center"><sub><b>0.5 GB</b><br>Wave Rising</sub></td>
+    <td align="center"><sub><b>0.7 GB</b><br>Accumulating</sub></td>
+    <td align="center"><sub><b>1.0 GB</b><br>50% Capacity</sub></td>
+    <td align="center"><sub><b>1.5 GB</b><br>75% Capacity</sub></td>
+    <td align="center"><sub><b>1.8 GB</b><br>90% Capacity</sub></td>
+    <td align="center"><sub><b>2.0 GB</b><br>Full Balance</sub></td>
   </tr>
 </table>
 
