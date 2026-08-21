@@ -21,7 +21,7 @@
 
 ## Overview
 
-FractalAndroid turns Android mobile devices into autonomous, privacy-preserving compute nodes within the Fractal distributed network. Operating in coordination with the central server (**FractalCore**), the application executes localized machine learning workloads—including on-device federated training (TFLite) and partitioned foundation model inference (ExecuTorch)—without exposing user data or degrading host device performance.
+FractalAndroid turns Android mobile devices into autonomous, privacy-preserving compute nodes within the Fractal distributed network. Operating in coordination with the central server (**FractalCore**), the application executes localized machine learning workloads—including on-device federated training (TFLite) and partitioned batch dataset training—without exposing user data or degrading host device performance.
 
 The client is designed with strict resource empathy: the engine continuously monitors physical hardware telemetry (SoC temperature, battery level, charging status, RAM pressure) and dynamically gates computation to guarantee zero impact on user experience or battery longevity.
 
@@ -53,40 +53,40 @@ The client is designed with strict resource empathy: the engine continuously mon
   <tr>
     <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Get started.png" width="100%" alt="Get Started"></td>
     <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Device Authorization.png" width="100%" alt="Device Authorization"></td>
-    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Registered Info.png" width="100%" alt="Registered Node Info"></td>
+    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Registered Info.png" width="100%" alt="Registered Info"></td>
   </tr>
   <tr>
-    <td align="center"><sub><b>Welcome & Onboarding:</b> Introductory node setup.</sub></td>
-    <td align="center"><sub><b>Device Authorization:</b> Firebase auth & hardware ID binding.</sub></td>
-    <td align="center"><sub><b>Registered Info:</b> Node specs, RAM/storage, and assigned cluster.</sub></td>
+    <td align="center"><sub><b>Get Started:</b> Platform onboarding introducing the decentralized compute harvesting paradigm.</sub></td>
+    <td align="center"><sub><b>Device Authorization:</b> Firebase auth & hardware ID binding (`ANDROID_ID`, CPU, RAM).</sub></td>
+    <td align="center"><sub><b>Registered Info:</b> Confirmed registration profile and assigned compute node telemetry.</sub></td>
   </tr>
 </table>
 
-### 2. Fleet Execution & Operational States
+### 2. Node Fleet States & Real-Time Compute
 <table>
   <tr>
+    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Home_inactive.png" width="100%" alt="Home Inactive"></td>
     <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Home_active.png" width="100%" alt="Home Active"></td>
-    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Home_Inactive.png" width="100%" alt="Home Inactive"></td>
-    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Settings.png" width="100%" alt="Node Settings"></td>
+    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - HeartBeat.png" width="100%" alt="Heartbeat Activity"></td>
   </tr>
   <tr>
-    <td align="center"><sub><b>Active Compute State:</b> Live training round, gradient computation, and token earnings.</sub></td>
-    <td align="center"><sub><b>Standby State:</b> Safe power preservation while awaiting cluster dispatch.</sub></td>
-    <td align="center"><sub><b>Node Settings:</b> Configurable telemetry thresholds and network policies.</sub></td>
+    <td align="center"><sub><b>Home (Standby / Inactive):</b> Idle state awaiting task assignment with live hardware monitors.</sub></td>
+    <td align="center"><sub><b>Home (Active Compute):</b> Active local training with pulsing fractal diamond indicator.</sub></td>
+    <td align="center"><sub><b>Heartbeat Monitor:</b> Real-time ping pulses syncing node availability with FractalCore.</sub></td>
   </tr>
 </table>
 
-### 3. Performance Telemetry & Hardware Insights
+### 3. Telemetry, Analytics & Training Insights
 <table>
   <tr>
     <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Usage Insights.png" width="100%" alt="Usage Insights"></td>
     <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Device Insights.png" width="100%" alt="Device Insights"></td>
-    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Model Training.png" width="100%" alt="Model Training Insights"></td>
+    <td width="33.3%" align="center"><img src="docs/assets/app_screens/WH - Model Training.png" width="100%" alt="Model Training"></td>
   </tr>
   <tr>
-    <td align="center"><sub><b>Usage Insights:</b> Cumulative compute contribution and bandwidth quotas.</sub></td>
-    <td align="center"><sub><b>Device Insights:</b> Real-time thermal graphs, battery curves, and RAM utilization.</sub></td>
-    <td align="center"><sub><b>Model Training:</b> Live loss trajectory and batch completion analytics.</sub></td>
+    <td align="center"><sub><b>Usage Insights:</b> Time-series telemetry graphs for CPU, RAM, battery, and thermals.</sub></td>
+    <td align="center"><sub><b>Device Insights:</b> Detailed hardware profiling with one-tap memory optimization.</sub></td>
+    <td align="center"><sub><b>Model Training:</b> Live loss convergence curves, parameter transfer rates, and epoch progress.</sub></td>
   </tr>
 </table>
 
@@ -149,7 +149,7 @@ graph TD
 
         subgraph ExecutionLayer ["Compute Execution Engine"]
             ImageTrainer["Image_Trainer (TFLite Engine)"]
-            MMapLoader["Zero-Copy MMap Loader (PTE Slices)"]
+            DataManager["DataManager (ByteBuffer Batch Loader)"]
             CheckpointMgr["CheckpointManager (.ckpt Serialization)"]
         end
 
@@ -167,7 +167,7 @@ graph TD
     VM --> UI
 
     OperationControl -->|"Permit: GRANTED"| ImageTrainer
-    OperationControl -->|"Permit: GRANTED"| MMapLoader
+    ImageTrainer --> DataManager
     ImageTrainer --> CheckpointMgr
     CheckpointMgr --> Transmitter
     Transmitter -->|"POST /api/model/upload"| ModelAggregator
@@ -184,7 +184,7 @@ The client enforces strict multi-variable gating via `OperationControl` before a
 | **Battery State-of-Charge** | Level $\ge$ 50% or Charging == True | Workload paused until charging connected |
 | **Battery Temperature** | Temp $\le$ 40.0 C | Execution paused until thermal normalization |
 | **Network Connectivity** | Unmetered Wi-Fi Connected | Checkpoint upload deferred |
-| **Memory Pressure** | System Memory Low == False | Zero-copy mmap bypasses ART heap |
+| **Memory Pressure** | System Memory Low == False | Batch buffer size throttled |
 
 ---
 
@@ -265,8 +265,8 @@ FractalAndroid/
 | **Ingress** | `Server_DAO` | Polling task endpoints with exponential backoff and payload decoding. |
 | **Gating** | `OperationControl` | Real-time multi-variable telemetry gating (Thermal, Battery, RAM). |
 | **Execution** | `Image_Trainer` | On-device gradient calculation using optimized TFLite mobile kernels. |
-| **Memory Map** | `PteLoader` (ExecuTorch) | Zero-copy virtual memory mapping (`mmap`) of partitioned `.pte` slices. |
-| **Persistence** | `CheckpointManager` | Serialization of intermediate parameter matrices. |
+| **Data Parsing** | `DataManager` / `FileOperations` | Loading binary dataset batches into direct `ByteBuffer` structures. |
+| **Persistence** | `CheckpointManager` | Serialization of intermediate parameter matrices (`.ckpt`). |
 | **Egress** | `ModelTransmitter` | Encrypted transmission of `.ckpt` parameter updates to FractalCore. |
 
 ---
