@@ -306,11 +306,11 @@ cd FractalAndroid
 
 ---
 
-## Governance
+## Governance & Licensing
 
-FractalAndroid is an open-source project architected by **[Ahmad Hassan (B-Ted)](https://github.com/Fractal-Compute-Orchestrations)**.
+FractalAndroid is architected and owned by **[Ahmad Hassan (B-Ted)](https://github.com/Fractal-Compute-Orchestrations)**.
 
 - Contributing: See [CONTRIBUTING.md](CONTRIBUTING.md)
 - Code of Conduct: See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 - Security Policy: See [SECURITY.md](SECURITY.md)
-- License: Open-source under the [MIT License](LICENSE)
+- License: Proprietary & Source-Available under the [Fractal Proprietary Non-Commercial License](LICENSE). All Rights Reserved. Commercial use strictly prohibited without written authorization.
