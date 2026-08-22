@@ -9,7 +9,7 @@
 [![Android API](https://img.shields.io/badge/API-24%2B-black?style=for-the-badge&logo=android)](https://developer.android.com/studio)
 [![Design](https://img.shields.io/badge/Design_Case_Study-Behance-black?style=for-the-badge&logo=behance)](https://www.behance.net/gallery/221459335/Fractal)
 [![Architecture](https://img.shields.io/badge/Architecture-MVVM-black?style=for-the-badge)](#)
-[![License](https://img.shields.io/badge/License-Proprietary_Non--Commercial-black?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/License-Proprietary_Non--Commercial_v3.0-black?style=for-the-badge)](LICENSE)
 [![Build Status](https://img.shields.io/badge/Build-Passing-black?style=for-the-badge)](https://github.com/Fractal-Compute-Orchestrations/FractalAndroid/actions/workflows/android.yml)
 
 **FractalAndroid is the distributed compute client and edge execution runtime for the Fractal decentralized intelligence framework.**
@@ -313,4 +313,4 @@ FractalAndroid is architected and owned by **[Ahmad Hassan (B-Ted)](https://gith
 - Contributing: See [CONTRIBUTING.md](CONTRIBUTING.md)
 - Code of Conduct: See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 - Security Policy: See [SECURITY.md](SECURITY.md)
-- License: Proprietary & Source-Available under the [Fractal Proprietary Non-Commercial License](LICENSE). All Rights Reserved. Commercial use strictly prohibited without written authorization.
+- License: Proprietary & Source-Available under the [Fractal Proprietary Source-Available & Non-Commercial Restrictive License v3.0](LICENSE). All Rights Reserved. Commercial use strictly prohibited without written authorization.

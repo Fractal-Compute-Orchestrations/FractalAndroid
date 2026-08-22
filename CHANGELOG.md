@@ -8,8 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.1.0] - 2024-05-11
 
 ### Added
-- Professional open-source project structure.
-- MIT License.
+- Professional project governance structure.
+- Fractal Proprietary Source-Available & Non-Commercial Restrictive License v3.0.
 - Contribution guidelines (`CONTRIBUTING.md`).
 - Code of Conduct (`CODE_OF_CONDUCT.md`).
 - Security policy (`SECURITY.md`).
