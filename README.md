@@ -9,7 +9,7 @@
 [![Android API](https://img.shields.io/badge/API-24%2B-black?style=for-the-badge&logo=android)](https://developer.android.com/studio)
 [![Design](https://img.shields.io/badge/Design_Case_Study-Behance-black?style=for-the-badge&logo=behance)](https://www.behance.net/gallery/221459335/Fractal)
 [![Architecture](https://img.shields.io/badge/Architecture-MVVM-black?style=for-the-badge)](#)
-[![License](https://img.shields.io/badge/License-MIT-black?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/License-Proprietary_Non--Commercial-black?style=for-the-badge)](LICENSE)
 [![Build Status](https://img.shields.io/badge/Build-Passing-black?style=for-the-badge)](https://github.com/Fractal-Compute-Orchestrations/FractalAndroid/actions/workflows/android.yml)
 
 **FractalAndroid is the distributed compute client and edge execution runtime for the Fractal decentralized intelligence framework.**
