@@ -3,6 +3,7 @@ package AppBackend.DataManager.DataLoaderAndInitializer
 import android.util.Log
 import AppBackend.TaskContainer.Image_Task
 import AppBackend.TaskContainer.Task
+import AppGlobal.Utils.FractalPaths
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -10,7 +11,9 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
 
-class Image_DataInitializer : DataInitializer {
+class Image_DataInitializer(
+    private val baseFilesDir: File? = null,
+) : DataInitializer {
 
     private val TAG = "Image_DataInit"
     private var imageStream: InputStream? = null
@@ -20,9 +23,8 @@ class Image_DataInitializer : DataInitializer {
         Log.d(TAG, "--> locadBatch(): Entering method.")
         val imageTask = task as Image_Task
 
-        val filesDir = "/data/data/org.fractal.app/files/"
-        val imgFile = File(filesDir, imageTask.TRAIN_IMAGES_FILENAME)
-        val lblFile = File(filesDir, imageTask.TRAIN_LABELS_FILENAME)
+        val imgFile = FractalPaths.resolveFile(imageTask.TRAIN_IMAGES_FILENAME, baseFilesDir)
+        val lblFile = FractalPaths.resolveFile(imageTask.TRAIN_LABELS_FILENAME, baseFilesDir)
 
         Log.d(TAG, "--> locadBatch(): Looking for Images: ${imgFile.absolutePath}")
         Log.d(TAG, "--> locadBatch(): Looking for Labels: ${lblFile.absolutePath}")

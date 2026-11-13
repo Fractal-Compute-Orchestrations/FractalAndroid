@@ -5,6 +5,7 @@ import AppBackend.LocalTrainingModule.TrainingStateManager.CheckpointManager
 import AppBackend.TaskContainer.Image_Task
 import AppBackend.TaskContainer.Task
 import AppFrontend.Interface.TrainingLogsDisplay.TrainingLogger // NEW IMPORT
+import AppGlobal.Utils.FractalPaths
 import org.tensorflow.lite.Interpreter
 import java.io.File
 import java.io.FileInputStream
@@ -14,14 +15,16 @@ import java.nio.FloatBuffer
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 
-class ImageTrainer : Trainer {
+class ImageTrainer(
+    private val baseFilesDir: File? = null,
+) : Trainer {
 
     override lateinit var task: Task
     override lateinit var trainingData: Any
     override lateinit var interpreter: Interpreter
     override var currentEpoch: Int = 0
 
-    private val checkpointManager = CheckpointManager()
+    private val checkpointManager = CheckpointManager(baseFilesDir)
     private val TAG = "ImageTrainer"
 
     override fun setUpTrainer(pTrainingData: Any?, pTask: Task) {
@@ -48,7 +51,7 @@ class ImageTrainer : Trainer {
 
     override fun loadModelFile(): MappedByteBuffer {
         val imageTask = task as Image_Task
-        val modelFile = File("/data/data/org.fractal.app/files/", imageTask.MODEL_FILENAME)
+        val modelFile = FractalPaths.resolveFile(imageTask.MODEL_FILENAME, baseFilesDir)
         Log.d(TAG, "--> loadModelFile(): Looking for model at ${modelFile.absolutePath}")
 
         if (!modelFile.exists()) {

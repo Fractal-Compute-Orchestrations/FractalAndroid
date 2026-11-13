@@ -10,15 +10,18 @@ import AppBackend.TaskContainer.TaskType
 import AppFrontend.Interface.Auth.DeviceAuthorization.LoginRegister_DTO
 import AppFrontend.Interface.Auth.DeviceUnregister.Unregister_DTO
 import AppFrontend.Interface.Auth.ForgetPassword.ForgetPassword_DTO
+import AppGlobal.Utils.FractalPaths
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import java.io.BufferedReader
+import java.io.ByteArrayInputStream
 import java.io.DataOutputStream
 import java.io.File
 import java.io.FileInputStream
+import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
@@ -27,7 +30,10 @@ import java.util.Date
 import java.util.Locale
 import org.json.JSONObject
 
-class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : Auth, ModelTransmission, TaskPopulate {
+class Server_DAO(
+    var networkConfig: networkConfig_ini = networkConfig_ini(),
+    private val baseFilesDir: File? = null,
+) : Auth, ModelTransmission, TaskPopulate {
 
     private val TAG = "Server_DAO"
 
@@ -152,15 +158,30 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
         val imageTask = modeltransmissionDto.task as Image_Task
         val taskId = imageTask.task_Id
         val ckptFilename = imageTask.CKPT_FILENAME
-        val uploadFile = File("/data/data/org.fractal.app/files/", ckptFilename)
+        val frqdCandidate = FractalPaths.resolveFile("$ckptFilename.frqd", baseFilesDir)
+        val uploadFile = if (frqdCandidate.exists()) {
+            frqdCandidate
+        } else {
+            FractalPaths.resolveFile(ckptFilename, baseFilesDir)
+        }
 
         if (!uploadFile.exists()) {
             Log.e(TAG, "Upload Failed: Checkpoint file does not exist at ${uploadFile.absolutePath}")
             return false
         }
 
-        // --- TASK JSON BUILDING BLOCK COMPLETELY REMOVED ---
+        FileInputStream(uploadFile).use { stream ->
+            return uploadStreamToServer(taskId, uploadFile.name, stream)
+        }
+    }
 
+    fun uploadBytesToServer(taskId: String, filename: String, payload: ByteArray): Boolean {
+        ByteArrayInputStream(payload).use { stream ->
+            return uploadStreamToServer(taskId, filename, stream)
+        }
+    }
+
+    private fun uploadStreamToServer(taskId: String, filename: String, payloadStream: InputStream): Boolean {
         val boundary = "FormBoundary" + System.currentTimeMillis()
         val lineEnd = "\r\n"
         val twoHyphens = "--"
@@ -182,30 +203,26 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
                 dos.write(text.toByteArray(Charsets.UTF_8))
             }
 
-            // 1. Send the task_Id as a simple text field
+            // 1. Send the task_Id as a text field
             writeTextPart(twoHyphens + boundary + lineEnd)
             writeTextPart("Content-Disposition: form-data; name=\"task_Id\"" + lineEnd)
             writeTextPart(lineEnd)
-            writeTextPart(taskId.toString() + lineEnd)
+            writeTextPart(taskId + lineEnd)
 
-            // --- JSON MULTIPART SECTION COMPLETELY REMOVED ---
-
-            // 2. Send the actual .ckpt model file bytes
+            // 2. Send the checkpoint or .frqd wire bundle bytes
             writeTextPart(twoHyphens + boundary + lineEnd)
-            writeTextPart("Content-Disposition: form-data; name=\"model_file\"; filename=\"$ckptFilename\"" + lineEnd)
+            writeTextPart("Content-Disposition: form-data; name=\"model_file\"; filename=\"$filename\"" + lineEnd)
             writeTextPart("Content-Type: application/octet-stream" + lineEnd)
             writeTextPart(lineEnd)
 
-            val fileInputStream = FileInputStream(uploadFile)
             val bufferSize = 1024 * 1024
             val buffer = ByteArray(bufferSize)
-            var bytesRead = fileInputStream.read(buffer, 0, bufferSize)
+            var bytesRead = payloadStream.read(buffer, 0, bufferSize)
 
             while (bytesRead > 0) {
                 dos.write(buffer, 0, bytesRead)
-                bytesRead = fileInputStream.read(buffer, 0, bufferSize)
+                bytesRead = payloadStream.read(buffer, 0, bufferSize)
             }
-            fileInputStream.close()
 
             writeTextPart(lineEnd)
             writeTextPart(twoHyphens + boundary + twoHyphens + lineEnd)
@@ -214,11 +231,10 @@ class Server_DAO(var networkConfig: networkConfig_ini = networkConfig_ini()) : A
 
             val responseCode = conn.responseCode
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Updated log message to reflect the new payload
-                Log.i(TAG, "Server accepted the uploaded model successfully!")
+                Log.i(TAG, "Server accepted uploaded payload ($filename) successfully.")
                 return true
             } else {
-                Log.e(TAG, "Server rejected the upload. HTTP Response Code: $responseCode")
+                Log.e(TAG, "Server rejected upload ($filename). HTTP Response Code: $responseCode")
             }
         } catch (e: Exception) {
             Log.e(TAG, "Exception during model upload: ${e.message}")

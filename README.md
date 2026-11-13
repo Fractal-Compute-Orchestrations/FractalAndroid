@@ -9,8 +9,8 @@
 [![Android API](https://img.shields.io/badge/API-24%2B-black?style=for-the-badge&logo=android)](https://developer.android.com/studio)
 [![Design](https://img.shields.io/badge/Design_Case_Study-Behance-black?style=for-the-badge&logo=behance)](https://www.behance.net/gallery/221459335/Fractal)
 [![Architecture](https://img.shields.io/badge/Architecture-MVVM-black?style=for-the-badge)](#)
-[![License](https://img.shields.io/badge/License-Proprietary_Non--Commercial_v3.0-black?style=for-the-badge)](LICENSE)
-[![Build Status](https://img.shields.io/badge/Build-Passing-black?style=for-the-badge)](https://github.com/Fractal-Compute-Orchestrations/FractalAndroid/actions/workflows/android.yml)
+[![License](https://img.shields.io/badge/License-Proprietary_Non--Commercial_v3.1-black?style=for-the-badge)](LICENSE)
+[![Android CI](https://github.com/Fractal-Compute-Orchestrations/FractalAndroid/actions/workflows/android.yml/badge.svg)](https://github.com/Fractal-Compute-Orchestrations/FractalAndroid/actions/workflows/android.yml)
 
 **FractalAndroid is the distributed compute client and edge execution runtime for the Fractal decentralized intelligence framework.**
 
@@ -316,15 +316,20 @@ FractalAndroid/
 git clone https://github.com/Fractal-Compute-Orchestrations/FractalAndroid.git
 cd FractalAndroid
 
-# 2. Build Debug APK
-./gradlew assembleDebug
+# 2. Run JVM Unit Tests (FRQ4/FRQD codec, thermal gating, path safety)
+./gradlew testDebugUnitTest
 
-# 3. Execute Unit Tests
-./gradlew test
+# 3. Build Debug APK
+./gradlew assembleDebug
 
 # 4. Install and Run on Connected Device
 ./gradlew installDebug
 ```
+
+### Wire-Compatible INT4 Codec & Storage Hardening
+- **`Int4BlockCodec` (`FRQ4` / `FRQD`)**: Kotlin encoder/decoder matching `FractalCore`'s `fractal_quant.codec` little-endian binary wire specification (`blockSize = 64`), verified bit-for-bit via `Int4BlockCodecTest` against Python codec test vectors.
+- **`OperationControl` Thermal & SoC Gating**: Enforces battery temperature (`<= 40.0 C`), `PowerManager.THERMAL_STATUS_SEVERE` throttling, charge floors, charging exclusivity, and Wi-Fi/cellular rules (`OperationControlTest`).
+- **`FractalPaths`**: Dynamically resolves `context.filesDir` with path-traversal validation (`FractalPathsTest`), eliminating hardcoded package directory paths.
 
 ---
 
@@ -353,9 +358,11 @@ FractalAndroid hardware-aware execution model, on-device telemetry gating, and m
 
 ## Governance & Licensing
 
-FractalAndroid is architected and owned by **[Ahmad Hassan (B-Ted)](https://github.com/Fractal-Compute-Orchestrations)**.
+FractalAndroid is maintained and owned by **[Fractal Compute Orchestrations](https://github.com/Fractal-Compute-Orchestrations)**.
 
 - Contributing: See [CONTRIBUTING.md](CONTRIBUTING.md)
 - Code of Conduct: See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 - Security Policy: See [SECURITY.md](SECURITY.md)
-- License: Proprietary & Source-Available under the [Fractal Proprietary Source-Available & Non-Commercial Restrictive License v3.0](LICENSE). All Rights Reserved. Commercial use strictly prohibited without written authorization.
+- Citation: See [CITATION.cff](CITATION.cff)
+- Notice: See [NOTICE](NOTICE)
+- License: Proprietary Source-Available & Non-Commercial under the [FRACTAL Proprietary Source-Available & Non-Commercial Restrictive License v3.1](LICENSE). Commercial use, hosted SaaS/PaaS monetization, and unauthorized startup/company derivative distribution are strictly prohibited.

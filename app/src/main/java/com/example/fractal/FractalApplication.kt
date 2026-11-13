@@ -7,6 +7,7 @@ import AppBackend.Network.Server_DAO.Server_DAO
 import AppGlobal.GlobalState
 import AppGlobal.app_config
 import AppGlobal.Utils.FileOperations
+import AppGlobal.Utils.FractalPaths
 import AppGlobal.Utils.GlobalUtils
 import androidx.appcompat.app.AppCompatDelegate
 import java.util.concurrent.Executors // Add this
@@ -24,6 +25,7 @@ class FractalApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        FractalPaths.init(this)
 
         // 1. MUST BE ON MAIN THREAD: Lock Theme Instantly
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)

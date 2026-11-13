@@ -65,3 +65,7 @@ app/release/
 
 # Private Staging
 .private_backup/
+
+# IDE and Kotlin compiler scratch logs
+.idea/
+.kotlin/

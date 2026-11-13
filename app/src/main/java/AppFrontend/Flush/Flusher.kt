@@ -3,16 +3,20 @@ package AppFrontend.Flush
 import android.util.Log
 import AppBackend.TaskContainer.Image_Task
 import AppBackend.TaskContainer.Task
+import AppGlobal.Utils.FractalPaths
 import java.io.File
 
-class Flusher {
+class Flusher(
+    private val baseFilesDir: File? = null,
+) {
     private val TAG = "Flusher"
-    private val filesDir = "/data/data/org.fractal.app/files/"
+    private val resolvedFilesDir: File
+        get() = FractalPaths.resolveFilesDir(baseFilesDir)
 
     fun flushCheckpoint(task: Task) {
         val imageTask = task as Image_Task
-        val ckptFile = File(filesDir, imageTask.CKPT_FILENAME)
-        val metaFile = File(filesDir, "${imageTask.task_Id}_meta.json")
+        val ckptFile = FractalPaths.resolveFile(imageTask.CKPT_FILENAME, baseFilesDir)
+        val metaFile = FractalPaths.resolveFile("${imageTask.task_Id}_meta.json", baseFilesDir)
 
         if (ckptFile.exists() && ckptFile.delete()) {
             Log.d(TAG, "--> Flushed checkpoint weights: ${ckptFile.name}")
@@ -24,9 +28,9 @@ class Flusher {
 
     fun flushCurrentTask(task: Task) {
         val imageTask = task as Image_Task
-        val imgFile = File(filesDir, imageTask.TRAIN_IMAGES_FILENAME)
-        val lblFile = File(filesDir, imageTask.TRAIN_LABELS_FILENAME)
-        val modelFile = File(filesDir, imageTask.MODEL_FILENAME)
+        val imgFile = FractalPaths.resolveFile(imageTask.TRAIN_IMAGES_FILENAME, baseFilesDir)
+        val lblFile = FractalPaths.resolveFile(imageTask.TRAIN_LABELS_FILENAME, baseFilesDir)
+        val modelFile = FractalPaths.resolveFile(imageTask.MODEL_FILENAME, baseFilesDir)
 
         if (imgFile.exists() && imgFile.delete()) Log.d(TAG, "--> Flushed training images: ${imgFile.name}")
         if (lblFile.exists() && lblFile.delete()) Log.d(TAG, "--> Flushed training labels: ${lblFile.name}")
@@ -42,7 +46,7 @@ class Flusher {
             flushCheckpoint(task)
 
             // 2. Directory Sweeper: Look for ANY leftover files with the task prefix
-            val directory = File(filesDir)
+            val directory = resolvedFilesDir
             if (directory.exists() && directory.isDirectory) {
                 val prefix = "${task.task_Id}_"
                 directory.listFiles()?.forEach { file ->
